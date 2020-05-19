@@ -1,0 +1,23 @@
+{
+  "name": "shuchkin/simplexlsxgen",
+  "description": "Export data to Excel XLSx file. PHP XLSX generator.",
+  "keywords": ["php", "excel", "xlsx", "generator", "creator", "backend"],
+  "homepage": "https://github.com/shuchkin/simplexlsxgen",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Sergey Shuchkin (SMSPILOT)",
+      "email": "sergey.shuchkin@gmail.com",
+      "homepage": "https://shuchkin.ru/"
+    }
+  ],
+  "autoload": {
+    "classmap": [
+      "src/SimpleXLSXGen.php"
+    ]
+  },
+  "require": {
+    "ext-mbstring": "*",
+    "ext-zlib": "*"
+  }
+}
