@@ -52,9 +52,9 @@ class SimpleXLSXGen {
 <sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="{CNT}" uniqueCount="{CNT}">{STRINGS}</sst>',
 			'xl/styles.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-<fonts count="1"><font><name val="Calibri"/><family val="2"/></font></fonts>
+<fonts count="2"><font><name val="Calibri"/><family val="2"/></font><font><name val="Calibri"/><family val="2"/><b/></font></fonts>
 <fills count="1"><fill><patternFill patternType="none"/></fill></fills>
-<borders count="1"><border diagonalUp="false" diagonalDown="false"><left/><right/><top/><bottom/><diagonal/></border></borders>
+<borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
 <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" /></cellStyleXfs>
 <cellXfs count="6">
 	<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
@@ -62,19 +62,14 @@ class SimpleXLSXGen {
 	<xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0"/>
 	<xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0"/>
 	<xf numFmtId="20" fontId="0" fillId="0" borderId="0" xfId="0"/>
-	<xf numFmtId="22" fontId="0" fillId="0" borderId="0" xfId="0"/>
+	<xf numFmtId="22" fontId="0" fillId="0" borderId="0" xfId="0"/>	
 </cellXfs>
 <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
 </styleSheet>',
 			'xl/workbook.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 <fileVersion appName="'.__CLASS__.'"/>
-<workbookPr backupFile="false" showObjects="all" date1904="false"/>
-<bookViews>
-<workbookView showHorizontalScroll="true" showVerticalScroll="true" showSheetTabs="true" xWindow="0" yWindow="0" windowWidth="16384" windowHeight="8192" tabRatio="205" firstSheet="0" activeTab="0"/>
-</bookViews>
 <sheets><sheet name="Sheet1" sheetId="1" state="visible" r:id="rId2"/></sheets>
-<calcPr iterateCount="100" refMode="A1" iterate="false" iterateDelta="0.001"/>
 </workbook>'
 		];
 		// <col min="1" max="1" width="22.1796875" bestFit="1" customWidth="1"/>
@@ -176,7 +171,7 @@ class SimpleXLSXGen {
 				$CUR_ROW++;
 				$row = '<row r="'.$CUR_ROW.'">';
 				$CUR_COL = 0;
-				foreach( $r as $k => $v ) {
+				foreach( $r as $v ) {
 					$CUR_COL++;
 					if ( !isset($COL[ $CUR_COL ])) {
 						$COL[ $CUR_COL ] = 0;
@@ -231,12 +226,12 @@ class SimpleXLSXGen {
 				$ROWS[] = $row . "</row>\r\n";
 			}
 			foreach ( $COL as $k => $max ) {
-				$COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.min( $max, 60).'" bestFit="1" customWidth="1" />';
+//				$COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.min( $max+1, 60).'" bestFit="true" customWidth="true" />';
+				$COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.min( $max+1, 60).'" />';
 			}
 			$REF = 'A1:'.$this->_num2name(count($COLS)).$CUR_ROW;
 		} else {
-//			$COLS[] = '<col min="1" max="7" width="7.18" bestFit="1" customWidth="1" />';
-			$COLS[] = '<col min="1" max="7" bestFit="1" />';
+			$COLS[] = '<col min="1" max="1" bestFit="1" />';
 			$ROWS[] = '<row r="1"><c r="A1" t="s"><v>0</v></c></row>';
 			$REF = 'A1:A1';
 			$SI[] = 'No Data';

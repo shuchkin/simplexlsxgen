@@ -1,4 +1,4 @@
-# SimpleXLSXGen class 0.9.10 (Official)
+# SimpleXLSXGen class 0.9.11 (Official)
 [<img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fshuchkin" />](https://www.patreon.com/shuchkin) [<img src="https://img.shields.io/github/license/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/blob/master/license.md) [<img src="https://img.shields.io/github/stars/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/stargazers) [<img src="https://img.shields.io/github/forks/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/network) [<img src="https://img.shields.io/github/issues/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/issues)
 
 Export data to Excel XLSX file. PHP XLSX generator. No external tools and libraries.<br/>
@@ -49,4 +49,5 @@ SimpleXLSXGen::fromArray( $data )->saveAs('datatypes.xlsx');
 ![XLSX screenshot](datatypes.png)
 
 ## History
+v0.9.11 (2020-05-21) removed XML unimportant attributes
 v0.9.10 (2020-05-20) initial relese
