@@ -203,9 +203,12 @@ class SimpleXLSXGen {
 						} elseif ( preg_match('/^(\d\d):(\d\d):(\d\d)$/', $v, $m ) ){
 							$cv = $this->_date2excel(0,0,0,$m[1],$m[2],$m[3]);
 							$cs = 4; // [14] mm-dd-yy
-						} elseif ( preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m ) ){
-							$cv = $this->_date2excel($m[1],$m[2],$m[3],$m[4],$m[5],$m[6]);
+						} elseif ( preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
+							$cv = $this->_date2excel( $m[1], $m[2], $m[3], $m[4], $m[5], $m[6] );
 							$cs = 5; // [22] m/d/yy h:mm
+						} elseif ( mb_strlen( $v ) > 160 ) {
+							$ct = 'inlineStr';
+							$cv = htmlentities( $v, ENT_QUOTES );
 						} else {
 							$ct = 's'; // shared string
 							$v = htmlentities($v, ENT_QUOTES);
@@ -221,7 +224,8 @@ class SimpleXLSXGen {
 						continue;
 					}
 
-					$row .= '<c r="' . $cname . '"'.($ct ? ' t="'.$ct.'"' : '').($cs ? ' s="'.$cs.'"' : '').'><v>' . $cv . "</v></c>\r\n";
+					$row .= '<c r="' . $cname . '"'.($ct ? ' t="'.$ct.'"' : '').($cs ? ' s="'.$cs.'"' : '').'>'
+						.($ct === 'inlineStr' ? '<is><t>'.$cv.'</t></is>' : '<v>' . $cv . '</v>')."</c>\r\n";
 				}
 				$ROWS[] = $row . "</row>\r\n";
 			}
