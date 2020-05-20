@@ -49,5 +49,5 @@ SimpleXLSXGen::fromArray( $data )->saveAs('datatypes.xlsx');
 ![XLSX screenshot](datatypes.png)
 
 ## History
-v0.9.11 (2020-05-21) removed XML unimportant attributes
+v0.9.11 (2020-05-21) removed XML unimportant attributes<br/>
 v0.9.10 (2020-05-20) initial relese
