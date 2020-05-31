@@ -181,7 +181,7 @@ class SimpleXLSXGen {
 					}
 					$COL[ $CUR_COL ] = max( mb_strlen( (string) $v ), $COL[ $CUR_COL ] );
 
-					$cname = $this->_num2name($CUR_COL).$CUR_ROW;
+					$cname = $this->num2name($CUR_COL) . $CUR_ROW;
 
 					$ct = $cs = null;
 
@@ -198,13 +198,13 @@ class SimpleXLSXGen {
 							$cv = round( $m[1] / 100, 4 );
 							$cs = 2; // [10] 0.00%
 						} elseif ( preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d)$/', $v, $m ) ){
-							$cv = $this->_date2excel($m[1],$m[2],$m[3]);
+							$cv = $this->date2excel($m[1],$m[2],$m[3]);
 							$cs = 3; // [14] mm-dd-yy
 						} elseif ( preg_match('/^(\d\d):(\d\d):(\d\d)$/', $v, $m ) ){
-							$cv = $this->_date2excel(0,0,0,$m[1],$m[2],$m[3]);
+							$cv = $this->date2excel(0,0,0,$m[1],$m[2],$m[3]);
 							$cs = 4; // [14] mm-dd-yy
 						} elseif ( preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
-							$cv = $this->_date2excel( $m[1], $m[2], $m[3], $m[4], $m[5], $m[6] );
+							$cv = $this->date2excel( $m[1], $m[2], $m[3], $m[4], $m[5], $m[6] );
 							$cs = 5; // [22] m/d/yy h:mm
 						} elseif ( mb_strlen( $v ) > 160 ) {
 							$ct = 'inlineStr';
@@ -233,7 +233,7 @@ class SimpleXLSXGen {
 //				$COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.min( $max+1, 60).'" bestFit="true" customWidth="true" />';
 				$COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.min( $max+1, 60).'" />';
 			}
-			$REF = 'A1:'.$this->_num2name(count($COLS)).$CUR_ROW;
+			$REF = 'A1:'.$this->num2name(count($COLS)) . $CUR_ROW;
 		} else {
 			$COLS[] = '<col min="1" max="1" bestFit="1" />';
 			$ROWS[] = '<row r="1"><c r="A1" t="s"><v>0</v></c></row>';
@@ -347,17 +347,16 @@ class SimpleXLSXGen {
 
 		return true;
 	}
-	private function _num2name($num) {
-		$numeric = ($num-1) % 26;
+	public function num2name($num) {
+		$numeric = ($num - 1) % 26;
 		$letter  = chr( 65 + $numeric );
 		$num2    = (int) ( ($num-1) / 26 );
 		if ( $num2 > 0 ) {
-			return $this->_num2name( $num2 - 1 ) . $letter;
+			return $this->num2name( $num2 ) . $letter;
 		}
-
 		return $letter;
 	}
-	private function _date2excel($year, $month, $day, $hours=0, $minutes=0, $seconds=0) {
+	public function date2excel($year, $month, $day, $hours=0, $minutes=0, $seconds=0) {
 		// self::CALENDAR_WINDOWS_1900
 		$excel1900isLeapYear = True;
 		if (((int)$year === 1900) && ($month <= 2)) { $excel1900isLeapYear = False; }
