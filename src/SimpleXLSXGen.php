@@ -208,10 +208,10 @@ class SimpleXLSXGen {
 							$cs = 5; // [22] m/d/yy h:mm
 						} elseif ( mb_strlen( $v ) > 160 ) {
 							$ct = 'inlineStr';
-							$cv = htmlentities( $v, ENT_QUOTES );
+							$cv = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
 						} else {
 							$ct = 's'; // shared string
-							$v = htmlentities($v, ENT_QUOTES);
+							$v = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
 							$cv             = array_search( $v, $SI, true );
 							if ( $cv === false ) {
 								$SI[] = $v;
