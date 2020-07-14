@@ -61,7 +61,7 @@ SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 
 
 ## History
-v0.9.15 (2020-07-14) escape of shared strings #1<br/>
+v0.9.15 (2020-07-14) escape of shared strings for special chars in cells [#1](https://github.com/shuchkin/simplexlsxgen/issues/1) <br/>
 v0.9.14 (2020-05-31) fixed num2name A-Z,AA-AZ column names, thx Ertan Yusufoglu<br/>
 v0.9.13 (2020-05-21) if string more 160 chars, save as inlineStr<br/>
 v0.9.12 (2020-05-21) readme fixed<br/>
