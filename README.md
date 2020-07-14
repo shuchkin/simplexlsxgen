@@ -48,6 +48,18 @@ SimpleXLSXGen::fromArray( $data )->saveAs('datatypes.xlsx');
 ```
 ![XLSX screenshot](datatypes.png)
 
+### Debug
+```php
+ini_set('error_reporting', E_ALL );
+ini_set('display_errors', 1 );
+
+$data = [
+    ['Debug', 123]
+]
+SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
+```
+
+
 ## History
 v0.9.14 (2020-05-31) fixed num2name A-Z,AA-AZ column names, thx Ertan Yusufoglu<br/>
 v0.9.13 (2020-05-21) if string more 160 chars, save as inlineStr<br/>
