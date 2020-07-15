@@ -117,7 +117,7 @@ class SimpleXLSXGen {
 		return true;
 	}
 	public function download() {
-		return $this->downloadAs( gmdate('YmdHi.xlsx') );
+		return $this->downloadAs( gmdate('YmdHi') . '.xlsx' );
 	}
 	public function downloadAs( $filename ) {
 		$fh = fopen('php://memory','wb');
