@@ -357,6 +357,12 @@ class SimpleXLSXGen {
 		return $letter;
 	}
 	public function date2excel($year, $month, $day, $hours=0, $minutes=0, $seconds=0) {
+	    $excelTime = (($hours * 3600) + ($minutes * 60) + $seconds) / 86400;
+
+	    if ( $year === 0 ) {
+	        return $excelTime;
+        }
+
 		// self::CALENDAR_WINDOWS_1900
 		$excel1900isLeapYear = True;
 		if (((int)$year === 1900) && ($month <= 2)) { $excel1900isLeapYear = False; }
@@ -374,8 +380,6 @@ class SimpleXLSXGen {
 		$decade = substr($year,2,2);
 		$excelDate = floor((146097 * $century) / 4) + floor((1461 * $decade) / 4) + floor((153 * $month + 2) / 5) + $day + 1721119 - $myExcelBaseDate + $excel1900isLeapYear;
 
-		$excelTime = (($hours * 3600) + ($minutes * 60) + $seconds) / 86400;
-
-			return (float) $excelDate + $excelTime;
-		}
+		return (float) $excelDate + $excelTime;
+	}
 }
