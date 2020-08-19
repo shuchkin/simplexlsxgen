@@ -214,7 +214,7 @@ class SimpleXLSXGen {
 							$ct = 's'; // shared string
 							$v = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
 							$cv = false;
-							if ( isset($SI_KEYS[$v]) ) {
+							if ( isset($SI_KEYS[$v]) && $SI_KEYS[$v] === $v ) {
 								$cv = $SI_KEYS[$v];
 							}
 
