@@ -162,6 +162,7 @@ class SimpleXLSXGen {
 		}
 
 		$SI = [];
+		$SI_KEYS = [];
 		$COLS = [];
 		$ROWS = [];
 		if ( count($this->rows)  ) {
@@ -212,10 +213,15 @@ class SimpleXLSXGen {
 						} else {
 							$ct = 's'; // shared string
 							$v = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
-							$cv             = array_search( $v, $SI, true );
+							$cv = false;
+							if ( isset($SI_KEYS[$v]) ) {
+								$cv = $SI_KEYS[$v];
+							}
+
 							if ( $cv === false ) {
 								$SI[] = $v;
 								$cv  = count( $SI ) - 1;
+								$SI_KEYS[$v] = $cv;
 							}
 						}
 					} elseif ( is_int( $v ) || is_float( $v ) ) {
