@@ -190,12 +190,12 @@ class SimpleXLSXGen {
 
 						if ( preg_match( '/^[-+]?\d{1,18}$/', $v ) ) {
 							$cv = ltrim($v,'+');
-						} elseif ( preg_match('/^[-+]?\d+\.?\d*$/', $v ) ) {
+						} elseif ( preg_match('/^[-+]?\d+\.\d+$/', $v ) ) {
 							$cv = ltrim($v,'+');
 						} elseif ( preg_match('/^([-+]?\d+)%$/', $v, $m) ) {
 							$cv = round( $m[1] / 100, 2);
 							$cs = 1; // [9] 0%
-						} elseif ( preg_match('/^([-+]\d+\.\d*)%$/', $v, $m) ) {
+						} elseif ( preg_match('/^([-+]\d+\.\d+)%$/', $v, $m) ) {
 							$cv = round( $m[1] / 100, 4 );
 							$cs = 2; // [10] 0.00%
 						} elseif ( preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d)$/', $v, $m ) ){
@@ -214,7 +214,7 @@ class SimpleXLSXGen {
 							$ct = 's'; // shared string
 							$v = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
 							$cv = false;
-							if ( isset($SI_KEYS[$v]) && $SI[$SI_KEYS[$v]] === $v ) {
+							if ( isset($SI_KEYS[$v]) ) {
 								$cv = $SI_KEYS[$v];
 							}
 
