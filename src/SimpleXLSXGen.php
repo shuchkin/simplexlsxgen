@@ -188,9 +188,9 @@ class SimpleXLSXGen {
 
 					if ( is_string($v) ) {
 
-						if ( preg_match( '/^[-+]?\d{1,18}$/', $v ) ) {
+						if ( preg_match( '/^[-+]?[1-9]\d{0,17}$/', $v ) ) {
 							$cv = ltrim($v,'+');
-						} elseif ( preg_match('/^[-+]?\d+\.\d+$/', $v ) ) {
+						} elseif ( preg_match('/^[-+]?(0|[1-9]\d*)\.\d+$/', $v ) ) {
 							$cv = ltrim($v,'+');
 						} elseif ( preg_match('/^([-+]?\d+)%$/', $v, $m) ) {
 							$cv = round( $m[1] / 100, 2);
@@ -214,14 +214,15 @@ class SimpleXLSXGen {
 							$ct = 's'; // shared string
 							$v = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
 							$cv = false;
-							if ( isset($SI_KEYS[$v]) ) {
-								$cv = $SI_KEYS[$v];
+							$skey = '~'.$v;
+							if ( isset($SI_KEYS[ $skey ]) ) {
+								$cv = $SI_KEYS[ $skey ];
 							}
 
 							if ( $cv === false ) {
 								$SI[] = $v;
 								$cv  = count( $SI ) - 1;
-								$SI_KEYS[$v] = $cv;
+								$SI_KEYS[$skey] = $cv;
 							}
 						}
 					} elseif ( is_int( $v ) || is_float( $v ) ) {
