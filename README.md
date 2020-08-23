@@ -1,4 +1,4 @@
-# SimpleXLSXGen class 0.9.18 (Official)
+# SimpleXLSXGen class 0.9.19 (Official)
 [<img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fshuchkin" />](https://www.patreon.com/shuchkin) [<img src="https://img.shields.io/github/license/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/blob/master/license.md) [<img src="https://img.shields.io/github/stars/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/stargazers) [<img src="https://img.shields.io/github/forks/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/network) [<img src="https://img.shields.io/github/issues/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/issues)
 
 Export data to Excel XLSX file. PHP XLSX generator. No external tools and libraries.<br/>
@@ -62,7 +62,8 @@ SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 
 
 ## History
-v0.9.18 (2020-08-22) fixed fast shared strings index<br/> 
+v0.9.19 (2020-08-23) Numbers like SKU right aligned now<br/>
+v0.9.18 (2020-08-22) Fixed fast shared strings index<br/> 
 v0.9.17 (2020-08-21) Fixed real numbers in 123.45 format detection, fast shared strings index (thx fredriksundin)<br/> 
 v0.9.16 (2020-07-29) Fixed time detection in HH:MM:SS format<br/>
 v0.9.15 (2020-07-14) escape of shared strings for special chars in cells [#1](https://github.com/shuchkin/simplexlsxgen/issues/1) <br/>

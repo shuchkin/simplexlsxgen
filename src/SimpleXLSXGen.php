@@ -58,11 +58,13 @@ class SimpleXLSXGen {
 <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" /></cellStyleXfs>
 <cellXfs count="6">
 	<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>
-	<xf numFmtId="9" fontId="0" fillId="0" borderId="0" xfId="0"/>	
-	<xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0"/>
-	<xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0"/>
-	<xf numFmtId="20" fontId="0" fillId="0" borderId="0" xfId="0"/>
-	<xf numFmtId="22" fontId="0" fillId="0" borderId="0" xfId="0"/>	
+	<xf numFmtId="1" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+	<xf numFmtId="9" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>	
+	<xf numFmtId="10" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+	<xf numFmtId="14" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+	<xf numFmtId="20" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+	<xf numFmtId="22" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1"/>
+	<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0" applyNumberFormat="1" applyAlignment="1"><alignment horizontal="right"/></xf>	
 </cellXfs>
 <cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
 </styleSheet>',
@@ -180,7 +182,9 @@ class SimpleXLSXGen {
 					if ( $v === null || $v === '' ) {
 						continue;
 					}
-					$COL[ $CUR_COL ] = max( mb_strlen( (string) $v ), $COL[ $CUR_COL ] );
+					$vl = mb_strlen( (string) $v );
+
+					$COL[ $CUR_COL ] = max( $vl, $COL[ $CUR_COL ] );
 
 					$cname = $this->num2name($CUR_COL) . $CUR_ROW;
 
@@ -188,29 +192,35 @@ class SimpleXLSXGen {
 
 					if ( is_string($v) ) {
 
-						if ( preg_match( '/^[-+]?[1-9]\d{0,17}$/', $v ) ) {
-							$cv = ltrim($v,'+');
+						if ( $v === '0' || preg_match( '/^[-+]?[1-9]\d{0,14}$/', $v ) ) { // Integer as General
+							$cv = ltrim( $v, '+' );
+							if ( $vl > 10 ) {
+								$cs = 1; // [1] 0
+							}
 						} elseif ( preg_match('/^[-+]?(0|[1-9]\d*)\.\d+$/', $v ) ) {
 							$cv = ltrim($v,'+');
 						} elseif ( preg_match('/^([-+]?\d+)%$/', $v, $m) ) {
 							$cv = round( $m[1] / 100, 2);
-							$cs = 1; // [9] 0%
+							$cs = 2; // [9] 0%
 						} elseif ( preg_match('/^([-+]\d+\.\d+)%$/', $v, $m) ) {
 							$cv = round( $m[1] / 100, 4 );
-							$cs = 2; // [10] 0.00%
+							$cs = 3; // [10] 0.00%
 						} elseif ( preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d)$/', $v, $m ) ){
 							$cv = $this->date2excel($m[1],$m[2],$m[3]);
-							$cs = 3; // [14] mm-dd-yy
+							$cs = 4; // [14] mm-dd-yy
 						} elseif ( preg_match('/^(\d\d):(\d\d):(\d\d)$/', $v, $m ) ){
 							$cv = $this->date2excel(0,0,0,$m[1],$m[2],$m[3]);
-							$cs = 4; // [14] mm-dd-yy
+							$cs = 5; // [14] mm-dd-yy
 						} elseif ( preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
 							$cv = $this->date2excel( $m[1], $m[2], $m[3], $m[4], $m[5], $m[6] );
-							$cs = 5; // [22] m/d/yy h:mm
+							$cs = 6; // [22] m/d/yy h:mm
 						} elseif ( mb_strlen( $v ) > 160 ) {
 							$ct = 'inlineStr';
 							$cv = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
 						} else {
+							if ( preg_match('/^[0-9+-.]+$/', $v ) ) { // Long ?
+								$cs = 7; // Align Right
+							}
 							$ct = 's'; // shared string
 							$v = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
 							$cv = false;
