@@ -216,13 +216,13 @@ class SimpleXLSXGen {
 							$cs = 6; // [22] m/d/yy h:mm
 						} elseif ( mb_strlen( $v ) > 160 ) {
 							$ct = 'inlineStr';
-							$cv = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
+							$cv = str_replace(['&','<','>',"\x03"],['&amp;','&lt;','&gt;',''], $v);
 						} else {
 							if ( preg_match('/^[0-9+-.]+$/', $v ) ) { // Long ?
 								$cs = 7; // Align Right
 							}
 							$ct = 's'; // shared string
-							$v = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
+							$v = str_replace(['&','<','>',"\x03"],['&amp;','&lt;','&gt;',''], $v);
 							$cv = false;
 							$skey = '~'.$v;
 							if ( isset($SI_KEYS[ $skey ]) ) {
