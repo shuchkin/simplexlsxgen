@@ -221,6 +221,7 @@ class SimpleXLSXGen {
 							if ( preg_match('/^[0-9+-.]+$/', $v ) ) { // Long ?
 								$cs = 7; // Align Right
 							}
+							$v = ltrim($v,"\0"); // disabled type detection
 							$ct = 's'; // shared string
 							$v = str_replace(['&','<','>'],['&amp;','&lt;','&gt;'], $v);
 							$cv = false;

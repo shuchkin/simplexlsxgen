@@ -1,4 +1,4 @@
-# SimpleXLSXGen class 0.9.19 (Official)
+# SimpleXLSXGen class 0.9.20 (Official)
 [<img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fshuchkin" />](https://www.patreon.com/shuchkin) [<img src="https://img.shields.io/github/license/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/blob/master/license.md) [<img src="https://img.shields.io/github/stars/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/stargazers) [<img src="https://img.shields.io/github/forks/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/network) [<img src="https://img.shields.io/github/issues/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/issues)
 
 Export data to Excel XLSX file. PHP XLSX generator. No external tools and libraries.<br/>
@@ -42,8 +42,9 @@ $data = [
     ['Procent', '12%'],
     ['Datetime', '2020-05-20 02:38:00'],
     ['Date','2020-05-20'],
-    ['Time','02:38:00'], 
-    ['String', 'See SimpleXLSXGen column autosize feature']
+    ['Time','02:38:00'],
+    ['String', 'See SimpleXLSXGen column autosize feature'],
+    ['Disable Type Detection', "\0".'2020-10-04 16:02:00']
 ];
 SimpleXLSXGen::fromArray( $data )->saveAs('datatypes.xlsx');
 ```
@@ -62,6 +63,7 @@ SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 
 
 ## History
+V0.9.20 (2020-10-04) Disable type detection if string started \0
 v0.9.19 (2020-08-23) Numbers like SKU right aligned now<br/>
 v0.9.18 (2020-08-22) Fixed fast shared strings index<br/> 
 v0.9.17 (2020-08-21) Fixed real numbers in 123.45 format detection, fast shared strings index (thx fredriksundin)<br/> 
