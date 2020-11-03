@@ -1,4 +1,4 @@
-# SimpleXLSXGen class 0.9.21 (Official)
+# SimpleXLSXGen class 0.9.22 (Official)
 [<img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fshuchkin" />](https://www.patreon.com/shuchkin) [<img src="https://img.shields.io/github/license/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/blob/master/license.md) [<img src="https://img.shields.io/github/stars/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/stargazers) [<img src="https://img.shields.io/github/forks/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/network) [<img src="https://img.shields.io/github/issues/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/issues)
 
 Export data to Excel XLSX file. PHP XLSX generator. No external tools and libraries.<br/>
@@ -16,12 +16,9 @@ $books = [
     [908606664, 'Slinky Malinki', 'Lynley Dodd', 'Mallinson Rendel', 'NZ']
 ];
 $xlsx = SimpleXLSXGen::fromArray( $books );
-$xlsx->saveAs('books.xlsx');
+$xlsx->saveAs('books.xlsx'); // or downloadAs('books.xlsx')
 ```
 ![XLSX screenshot](books.png)
-```
-// SimpleXLSXGen::download() or SimpleXSLSXGen::downloadAs('table.xlsx');
-```
 
 ## Installation
 The recommended way to install this library is [through Composer](https://getcomposer.org).
@@ -49,7 +46,19 @@ $data = [
 SimpleXLSXGen::fromArray( $data )->saveAs('datatypes.xlsx');
 ```
 ![XLSX screenshot](datatypes.png)
-
+### Fluid examples
+```php
+SimpleXLSXGen::fromArray( $books )->downloadAs('table.xlsx'); // output to browser for download
+SimpleXLSXGen::fromArray( $books )->addSheet( $books2 )->download(); // multiple sheets
+(new SimpleXLSXGen)->addSheet( $books, 'Modern style')->save();
+```
+### Old school, multiple sheets
+```php
+$xlsx = new SimpleXLSXGen();
+$xlsx->addSheet( $books, 'Catalog 2021' );
+$xlsx->addSheet( $books2, 'Stephen King catalog');
+$xlsx->downloadAs('books_2021.xlsx');
+```
 ### Debug
 ```php
 ini_set('error_reporting', E_ALL );
@@ -63,6 +72,7 @@ SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 
 
 ## History
+v0.9.22 (2020-11-04) Added multiple sheets support, thx [Savino59](https://github.com/Savino59), class ready for extend now<br/> 
 v0.9.21 (2020-10-17) Updated images<br/>
 v0.9.20 (2020-10-04) Disable type detection if string started with chr(0)<br/>
 v0.9.19 (2020-08-23) Numbers like SKU right aligned now<br/>
