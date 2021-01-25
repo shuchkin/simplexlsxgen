@@ -223,7 +223,7 @@ class SimpleXLSXGen {
 			} elseif ( $cfilename === 'xl/worksheets/sheet1.xml' ) {
 				foreach ( $this->sheets as $k => $v ) {
 					$filename = 'xl/worksheets/sheet'.($k+1).'.xml';
-					$xml = $this->_sheetToXML($this->sheets[$k], $template);
+					$xml = $this->_sheetToXML($k, $template);
 					$this->_writeEntry($fh, $cdrec, $filename, $xml );
 					$entries++;
 				}
@@ -330,14 +330,16 @@ class SimpleXLSXGen {
 		$cdrec .= $e['comments'];
 	}
 
-	protected function _sheetToXML(&$sheet, $template) {
-
+	protected function _sheetToXML($idx, $template) {
+		// locale floats fr_FR 1.234,56 -> 1234.56
+		$_loc = setlocale(LC_NUMERIC,'');
+		setlocale(LC_NUMERIC,'C');
 		$COLS = [];
 		$ROWS = [];
-		if ( count($sheet['rows']) ) {
+		if ( count($this->sheets[$idx]['rows']) ) {
 			$CUR_ROW = 0;
 			$COL = [];
-			foreach( $sheet['rows'] as $r ) {
+			foreach( $this->sheets[$idx]['rows'] as $r ) {
 				$CUR_ROW++;
 				$row = '<row r="'.$CUR_ROW.'">';
 				$CUR_COL = 0;
@@ -409,7 +411,9 @@ class SimpleXLSXGen {
 								$this->SI_KEYS[$skey] = $cv;
 							}
 						}
-					} elseif ( is_int( $v ) || is_float( $v ) ) {
+					} elseif ( is_int( $v ) ) {
+						$cv = $v;
+					} elseif ( is_float( $v ) ) {
 						$cv = $v;
 					} else {
 						continue;
@@ -429,6 +433,9 @@ class SimpleXLSXGen {
 			$ROWS[] = '<row r="1"><c r="A1" t="s"><v>0</v></c></row>';
 			$REF = 'A1:A1';
 		}
+		//restore locale
+		setlocale(LC_NUMERIC, $_loc);
+
 		return str_replace(['{REF}','{COLS}','{ROWS}'],
 			[ $REF, implode("\r\n", $COLS), implode("\r\n",$ROWS) ],
 			$template );
