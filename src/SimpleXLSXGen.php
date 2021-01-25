@@ -332,7 +332,7 @@ class SimpleXLSXGen {
 
 	protected function _sheetToXML($idx, $template) {
 		// locale floats fr_FR 1.234,56 -> 1234.56
-		$_loc = setlocale(LC_NUMERIC,'');
+		$_loc = setlocale(LC_NUMERIC, 0);
 		setlocale(LC_NUMERIC,'C');
 		$COLS = [];
 		$ROWS = [];
