@@ -351,15 +351,14 @@ class SimpleXLSXGen {
 					if ( $v === null || $v === '' ) {
 						continue;
 					}
-					$vl = mb_strlen( (string) $v );
-
-					$COL[ $CUR_COL ] = max( $vl, $COL[ $CUR_COL ] );
 
 					$cname = $this->num2name($CUR_COL) . $CUR_ROW;
 
 					$ct = $cs = null;
 
 					if ( is_string($v) ) {
+
+						$vl = mb_strlen( $v );
 
 						if ( $v === '0' || preg_match( '/^[-+]?[1-9]\d{0,14}$/', $v ) ) { // Integer as General
 							$cv = ltrim( $v, '+' );
@@ -412,12 +411,20 @@ class SimpleXLSXGen {
 							}
 						}
 					} elseif ( is_int( $v ) ) {
+						$vl = mb_strlen( (string) $v );
 						$cv = $v;
 					} elseif ( is_float( $v ) ) {
+						$vl = mb_strlen( (string) $v );
 						$cv = $v;
+					} elseif ( $v instanceof DateTime ) {
+						$vl = 16;
+						$cv = $this->date2excel( $v->format('Y'), $v->format('m'), $v->format('d'), $v->format('H'), $v->format('i'), $v->format('s') );
+						$cs = 6; // [22] m/d/yy h:mm
 					} else {
 						continue;
 					}
+
+					$COL[ $CUR_COL ] = max( $vl, $COL[ $CUR_COL ] );
 
 					$row .= '<c r="' . $cname . '"'.($ct ? ' t="'.$ct.'"' : '').($cs ? ' s="'.$cs.'"' : '').'>'
 					        .($ct === 'inlineStr' ? '<is><t>'.$cv.'</t></is>' : '<v>' . $cv . '</v>')."</c>\r\n";

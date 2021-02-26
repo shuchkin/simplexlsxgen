@@ -1,4 +1,4 @@
-# SimpleXLSXGen class 0.9.24 (Official)
+# SimpleXLSXGen class 0.9.25 (Official)
 [<img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fshuchkin" />](https://www.patreon.com/shuchkin) [<img src="https://img.shields.io/github/license/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/blob/master/license.md) [<img src="https://img.shields.io/github/stars/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/stargazers) [<img src="https://img.shields.io/github/forks/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/network) [<img src="https://img.shields.io/github/issues/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/issues)
 
 Export data to Excel XLSX file. PHP XLSX generator. No external tools and libraries.<br/>
@@ -40,8 +40,9 @@ $data = [
     ['Datetime', '2020-05-20 02:38:00'],
     ['Date','2020-05-20'],
     ['Time','02:38:00'],
+    ['Datetime PHP', new DateTime('2021-02-06 21:07:00')],
     ['String', 'Long UTF-8 String in autoresized column'],
-    ['Disable Type Detection', "\0".'2020-10-04 16:02:00']
+    ['RAW string', "\0".'2020-10-04 16:02:00']
 ];
 SimpleXLSXGen::fromArray( $data )->saveAs('datatypes.xlsx');
 ```
@@ -72,6 +73,7 @@ SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 
 
 ## History
+v0.9.25 (2021-02-26) Added PHP Datetime object values in a cells
 v0.9.24 (2021-02-26) * Percent<br/>
 v0.9.23 (2021-01-25) Fix local floats in XML<br/>
 v0.9.22 (2020-11-04) Added multiple sheets support, thx [Savino59](https://github.com/Savino59), class ready for extend now<br/> 
