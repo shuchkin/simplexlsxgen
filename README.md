@@ -16,7 +16,7 @@ $books = [
     [908606664, 'Slinky Malinki', 'Lynley Dodd', 'Mallinson Rendel', 'NZ']
 ];
 $xlsx = SimpleXLSXGen::fromArray( $books );
-$xlsx->saveAs('books.xlsx'); // or downloadAs('books.xlsx')
+$xlsx->saveAs('books.xlsx'); // or downloadAs('books.xlsx') or $xlsx_content = (string) $xlsx 
 ```
 ![XLSX screenshot](books.png)
 
@@ -73,7 +73,7 @@ SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 
 
 ## History
-v0.9.25 (2021-02-26) Added PHP Datetime object values in a cells
+v0.9.25 (2021-02-26) Added PHP Datetime object values in a cells<br/>
 v0.9.24 (2021-02-26) * Percent<br/>
 v0.9.23 (2021-01-25) Fix local floats in XML<br/>
 v0.9.22 (2020-11-04) Added multiple sheets support, thx [Savino59](https://github.com/Savino59), class ready for extend now<br/> 
