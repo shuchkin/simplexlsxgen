@@ -97,7 +97,7 @@ SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 
 
 ## History
-v1.0.10 (2021-05-03) + Hyperlinks, + Minimal formatting
+v1.0.10 (2021-05-03) + Hyperlinks, + Minimal formatting<br/>
 v0.9.25 (2021-02-26) Added PHP Datetime object values in a cells<br/>
 v0.9.24 (2021-02-26) * Percent<br/>
 v0.9.23 (2021-01-25) Fix local floats in XML<br/>
