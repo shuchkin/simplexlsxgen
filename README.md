@@ -1,4 +1,4 @@
-# SimpleXLSXGen class 1.0.10 (Official)
+# SimpleXLSXGen class 1.0.11 (Official)
 [<img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fshuchkin" />](https://www.patreon.com/shuchkin) [<img src="https://img.shields.io/github/license/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/blob/master/license.md) [<img src="https://img.shields.io/github/stars/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/stargazers) [<img src="https://img.shields.io/github/forks/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/network) [<img src="https://img.shields.io/github/issues/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/issues)
 
 Export data to Excel XLSX file. PHP XLSX generator. No external tools and libraries.<br/>
@@ -49,19 +49,7 @@ $data = [
 SimpleXLSXGen::fromArray( $data )->saveAs('datatypes.xlsx');
 ```
 ![XLSX screenshot](datatypes.png)
-### Fluid examples
-```php
-SimpleXLSXGen::fromArray( $books )->downloadAs('table.xlsx'); // output to browser for download
-SimpleXLSXGen::fromArray( $books )->addSheet( $books2 )->download(); // multiple sheets
-(new SimpleXLSXGen)->addSheet( $books, 'Modern style')->save();
-```
-### Old school, multiple sheets
-```php
-$xlsx = new SimpleXLSXGen();
-$xlsx->addSheet( $books, 'Catalog 2021' );
-$xlsx->addSheet( $books2, 'Stephen King catalog');
-$xlsx->downloadAs('books_2021.xlsx');
-```
+
 ### Formatting
 ```php
 $data = [
@@ -84,6 +72,26 @@ SimpleXLSXGen::fromArray( $data )
     ->saveAs('styles_and_tags.xlsx');
 ```
 ![XLSX screenshot](styles.png)
+
+### More examples
+```php
+// Fluid interface, output to browser for download
+SimpleXLSXGen::fromArray( $books )->downloadAs('table.xlsx');
+
+// Fluid interface, multiple sheets
+SimpleXLSXGen::fromArray( $books )->addSheet( $books2 )->download();
+
+// Alternative interface, sheet name, get xlsx content
+$xlsx_cache = (string) (new SimpleXLSXGen)->addSheet( $books, 'Modern style');
+
+// Classice interface
+$xlsx = new SimpleXLSXGen();
+$xlsx->addSheet( $books, 'Catalog 2021' );
+$xlsx->addSheet( $books2, 'Stephen King catalog');
+$xlsx->downloadAs('books_2021.xlsx');
+exit();
+```
+
 ### Debug
 ```php
 ini_set('error_reporting', E_ALL );
@@ -97,6 +105,7 @@ SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 
 
 ## History
+v1.0.11 (2021-05-14) Fixed 0.00% format, thx [marcrobledo](https://github.com/shuchkin/simplexlsxgen/pull/34), more examples in README.md<br/>
 v1.0.10 (2021-05-03) + Hyperlinks, + Minimal formatting<br/>
 v0.9.25 (2021-02-26) Added PHP Datetime object values in a cells<br/>
 v0.9.24 (2021-02-26) * Percent<br/>
