@@ -476,7 +476,7 @@ class SimpleXLSXGen {
 							} elseif ( preg_match( '/^([-+]?\d+)%$/', $v, $m ) ) {
 								$cv = round( $m[1] / 100, 2 );
 								$N = self::N_PERCENT_INT; // [9] 0%
-							} elseif ( preg_match( '/^([-+]\d+\.\d+)%$/', $v, $m ) ) {
+							} elseif ( preg_match( '/^([-+]?\d+\.\d+)%$/', $v, $m ) ) {
 								$cv = round( $m[1] / 100, 4 );
 								$N = self::N_PRECENT_DEC; // [10] 0.00%
 							} elseif ( preg_match( '/^(\d\d\d\d)-(\d\d)-(\d\d)$/', $v, $m ) ) {
