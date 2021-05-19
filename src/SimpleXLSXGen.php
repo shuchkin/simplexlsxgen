@@ -496,7 +496,7 @@ class SimpleXLSXGen {
 								$N = self::N_DATETIME; // [22] m/d/yy h:mm
 							} elseif ( preg_match( '/^[0-9+-.]+$/', $v ) ) { // Long ?
 								$A = self::A_RIGHT;
-							} elseif ( preg_match( '/https?:\/\/\S+/i', $v ) ) {
+							} elseif ( preg_match( '/^https?:\/\/\S+$/i', $v ) ) {
 								$h = explode( '#', $v );
 								$this->sheets[ $idx ]['hyperlinks'][] = ['ID' => 'rId' . ( count( $this->sheets[ $idx ]['hyperlinks'] ) + 1 ), 'R' => $cname, 'H' => $h[0], 'L' => isset( $h[1] ) ? $h[1] : ''];
 								$F = self::F_HYPERLINK; // Hyperlink

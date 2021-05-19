@@ -84,7 +84,7 @@ SimpleXLSXGen::fromArray( $books )->addSheet( $books2 )->download();
 // Alternative interface, sheet name, get xlsx content
 $xlsx_cache = (string) (new SimpleXLSXGen)->addSheet( $books, 'Modern style');
 
-// Classice interface
+// Classic interface
 $xlsx = new SimpleXLSXGen();
 $xlsx->addSheet( $books, 'Catalog 2021' );
 $xlsx->addSheet( $books2, 'Stephen King catalog');
@@ -92,7 +92,7 @@ $xlsx->downloadAs('books_2021.xlsx');
 exit();
 ```
 
-### Debug
+## Debug
 ```php
 ini_set('error_reporting', E_ALL );
 ini_set('display_errors', 1 );
@@ -102,24 +102,3 @@ $data = [
 ]
 SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 ```
-
-
-## History
-v1.0.11 (2021-05-14) Fixed 0.00% format, thx [marcrobledo](https://github.com/shuchkin/simplexlsxgen/pull/34), more examples in README.md<br/>
-v1.0.10 (2021-05-03) + Hyperlinks, + Minimal formatting<br/>
-v0.9.25 (2021-02-26) Added PHP Datetime object values in a cells<br/>
-v0.9.24 (2021-02-26) * Percent<br/>
-v0.9.23 (2021-01-25) Fix local floats in XML<br/>
-v0.9.22 (2020-11-04) Added multiple sheets support, thx [Savino59](https://github.com/Savino59), class ready for extend now<br/> 
-v0.9.21 (2020-10-17) Updated images<br/>
-v0.9.20 (2020-10-04) Disable type detection if string started with chr(0)<br/>
-v0.9.19 (2020-08-23) Numbers like SKU right aligned now<br/>
-v0.9.18 (2020-08-22) Fixed fast shared strings index<br/> 
-v0.9.17 (2020-08-21) Fixed real numbers in 123.45 format detection, fast shared strings index (thx fredriksundin)<br/> 
-v0.9.16 (2020-07-29) Fixed time detection in HH:MM:SS format<br/>
-v0.9.15 (2020-07-14) escape of shared strings for special chars in cells [#1](https://github.com/shuchkin/simplexlsxgen/issues/1) <br/>
-v0.9.14 (2020-05-31) fixed num2name A-Z,AA-AZ column names, thx Ertan Yusufoglu<br/>
-v0.9.13 (2020-05-21) if string more 160 chars, save as inlineStr<br/>
-v0.9.12 (2020-05-21) readme fixed<br/>
-v0.9.11 (2020-05-21) removed XML unimportant attributes<br/>
-v0.9.10 (2020-05-20) initial release
