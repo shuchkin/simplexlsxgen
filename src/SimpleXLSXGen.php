@@ -245,9 +245,9 @@ class SimpleXLSXGen {
 				}
 				$xml = null;
 			} elseif ( $cfilename === 'xl/worksheets/_rels/sheet1.xml.rels' ) {
-				$RH = [];
 				foreach ( $this->sheets as $k => $v ) {
 					if ( count($v['hyperlinks'])) {
+						$RH = [];
 						$filename = 'xl/worksheets/_rels/sheet' . ( $k + 1 ) . '.xml.rels';
 						foreach ( $v['hyperlinks'] as $h ) {
 							$RH[] = '<Relationship Id="' . $h['ID'] . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="' . $h['H'] . '" TargetMode="External"/>';

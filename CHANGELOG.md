@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.13 (2021-05-29)
+
+* Fixed hyperlinks in several sheets
+* Added [Opencollective donation link](https://opencollective.com/simplexlsx)
+
 ## 1.0.12 (2021-05-19)
 
 * Fixed hyperlink regex
