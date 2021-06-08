@@ -5,7 +5,7 @@
 * Added *mailto* hyperlinks support (thx Howard Martin)
 ```php
 SimpleXLSXGen::fromArray([
-	'Mailto hyperlink', '&lt;a href="mailto:sergey.shuchkin@gmail.com"&gt;Please email me&lt;/a&gt;'
+	['Mailto hyperlink', '<a href="mailto:sergey.shuchkin@gmail.com">Please email me</a>']
 ])->saveAs('test.xlsx');
 ```
 ## 1.0.13 (2021-05-29)
