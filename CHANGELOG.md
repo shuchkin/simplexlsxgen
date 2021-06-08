@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.0.14 (2021-06-08)
+
+* Added *mailto* hyperlinks support (thx Howard Martin)
+```php
+SimpleXLSXGen::fromArray([
+	'Mailto hyperlink', '&lt;a href="mailto:sergey.shuchkin@gmail.com"&gt;Please email me&lt;/a&gt;'
+])->saveAs('test.xlsx');
+```
 ## 1.0.13 (2021-05-29)
 
 * Fixed hyperlinks in several sheets
