@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.15 (2021-06-22)
+
+* Fixed *mailto* hyperlinks detection
+
 ## 1.0.14 (2021-06-08)
 
 * Added *mailto* hyperlinks support (thx Howard Martin)
