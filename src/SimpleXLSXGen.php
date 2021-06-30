@@ -250,7 +250,7 @@ class SimpleXLSXGen {
 						$RH = [];
 						$filename = 'xl/worksheets/_rels/sheet' . ( $k + 1 ) . '.xml.rels';
 						foreach ( $v['hyperlinks'] as $h ) {
-							$RH[] = '<Relationship Id="' . $h['ID'] . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="' . $h['H'] . '" TargetMode="External"/>';
+							$RH[] = '<Relationship Id="' . $h['ID'] . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="' . $this->esc($h['H']) . '" TargetMode="External"/>';
 						}
 						$xml = str_replace( '{HYPERLINKS}', implode( "\r\n", $RH ), $template );
 						$this->_writeEntry( $fh, $cdrec, $filename, $xml );
