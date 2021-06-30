@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.16 (2021-07-01)
+
+* Fixed &quot;&amp;&quot; in hyperlinks
+
 ## 1.0.15 (2021-06-22)
 
 * Fixed *mailto* hyperlinks detection
