@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.17 (2021-07-28)
+
+* Fixed &quot; and &amp; in sheets names
+
 ## 1.0.16 (2021-07-01)
 
 * Fixed &quot;&amp;&quot; in hyperlinks

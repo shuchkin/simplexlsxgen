@@ -217,7 +217,7 @@ class SimpleXLSXGen {
 			} elseif ( $cfilename === 'xl/workbook.xml' ) {
 				$s = '';
 				foreach ( $this->sheets as $k => $v ) {
-					$s .= '<sheet name="' . $v['name'] . '" sheetId="' . ( $k + 1) . '" state="visible" r:id="rId' . ( $k + 2) . '"/>';
+					$s .= '<sheet name="' . $this->esc( $v['name'] ) . '" sheetId="' . ( $k + 1) . '" state="visible" r:id="rId' . ( $k + 2) . '"/>';
 				}
 				$template = str_replace('{SHEETS}', $s, $template);
 				$this->_writeEntry($fh, $cdrec, $cfilename, $template);
