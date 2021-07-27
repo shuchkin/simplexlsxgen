@@ -504,7 +504,7 @@ class SimpleXLSXGen {
 								$h = explode( '#', $v );
 								$this->sheets[ $idx ]['hyperlinks'][] = ['ID' => 'rId' . ( count( $this->sheets[ $idx ]['hyperlinks'] ) + 1 ), 'R' => $cname, 'H' => $h[0], 'L' => isset( $h[1] ) ? $h[1] : ''];
 								$F = self::F_HYPERLINK; // Hyperlink
-							} elseif ( preg_match( "/^([a-zA-Z0-9_\.\-]+)@([a-zA-Z0-9\-]+)\.([a-zA-Z0-9\-\.]*)$/i", $v ) ) {
+							} elseif ( preg_match( "/^[a-zA-Z0-9_\.\-]+@([a-zA-Z0-9][a-zA-Z0-9\-]*\.)+[a-zA-Z]{2,}$/", $v ) ) {
 								$this->sheets[ $idx ]['hyperlinks'][] = ['ID' => 'rId' . ( count( $this->sheets[ $idx ]['hyperlinks'] ) + 1 ), 'R' => $cname, 'H' => 'mailto:' . $v, 'L' => ''];
 								$F = self::F_HYPERLINK; // Hyperlink
 							}

@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.18 (2021-07-28)
+
+* Fixed email regex
+
 ## 1.0.17 (2021-07-28)
 
 * Fixed &quot; and &amp; in sheets names
