@@ -117,6 +117,14 @@ class SimpleXLSXGen {
 	public function addSheet( array $rows, $name = null ) {
 		$this->curSheet++;
 
+		if ( $name !== null ) {
+			foreach( $this->sheets as $sh ) {
+				if ( $name === $sh['name'] ) {
+					$name .= ' ' . mt_rand( 100000, 999999 );
+				}
+			}
+		}
+
 		$this->sheets[$this->curSheet] = ['name' => $name ?: 'Sheet'.($this->curSheet+1), 'hyperlinks' => []];
 
 		if ( is_array( $rows ) && isset( $rows[0] ) && is_array($rows[0]) ) {

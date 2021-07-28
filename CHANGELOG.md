@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.19 (2021-07-28)
+
+* Fixed sheet names duplicates 
+
 ## 1.0.18 (2021-07-28)
 
 * Fixed email regex
