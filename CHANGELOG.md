@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.20 (2021-07-29)
+
+* Fixed sheet names duplicates (Page, Page (1), Page (2)...) 
+
 ## 1.0.19 (2021-07-28)
 
 * Fixed sheet names duplicates 
