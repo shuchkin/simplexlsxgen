@@ -249,8 +249,8 @@ class SimpleXLSXGen {
 					$this->SI[] = 'No Data';
 				}
 				$si_cnt = count($this->SI);
-				$this->SI = '<si><t>'.implode("</t></si>\r\n<si><t>", $this->SI).'</t></si>';
-				$template = str_replace(['{CNT}', '{STRINGS}'], [ $si_cnt, $this->SI ], $template );
+				$si = '<si><t>'.implode("</t></si>\r\n<si><t>", $this->SI).'</t></si>';
+				$template = str_replace(['{CNT}', '{STRINGS}'], [ $si_cnt, $si ], $template );
 				$this->_writeEntry($fh, $cdrec, $cfilename, $template);
 				$entries++;
 			} elseif ( $cfilename === 'xl/worksheets/sheet1.xml' ) {

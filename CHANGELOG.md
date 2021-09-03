@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.21 (2021-09-03)
+
+*  Fixed saveAs / downloadAs / etc methods more than once
+
 ## 1.0.20 (2021-07-29)
 
 * Fixed sheet names duplicates (Page, Page (1), Page (2)...) 
