@@ -122,11 +122,11 @@ class SimpleXLSXGen {
 		} else {
 			$names = [];
 			foreach( $this->sheets as $sh ) {
-				$names[ strtoupper( $sh['name']) ] = 1;
+				$names[ mb_strtoupper( $sh['name']) ] = 1;
 			}
 			for( $i = 0; $i < 100; $i++ ) {
 				$new_name = ($i === 0) ? $name : $name .' ('.$i.')';
-				$NEW_NAME = strtoupper( $new_name );
+				$NEW_NAME = mb_strtoupper( $new_name );
 				if ( !isset( $names[ $NEW_NAME ]) ) {
 					$name = $new_name;
 					break;
