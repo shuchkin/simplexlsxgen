@@ -659,6 +659,6 @@ class SimpleXLSXGen {
 		return $this;
 	}
 	public function esc( $str ) {
-		return str_replace( ['&', '<', '>', "\x03"], ['&amp;', '&lt;', '&gt;', ''], $str );
+		return str_replace( ['&', '<', '>', "\x03", ''], ['&amp;', '&lt;', '&gt;', '', ''], $str );
 	}
 }
