@@ -659,6 +659,8 @@ class SimpleXLSXGen {
 		return $this;
 	}
 	public function esc( $str ) {
-		return str_replace( ['&', '<', '>', "\x03"], ['&amp;', '&lt;', '&gt;', ''], $str );
+		// XML UTF-8: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+		// but we use fast version
+		return str_replace( ['&', '<', '>', "\x00","\x03","\x0B"], ['&amp;', '&lt;', '&gt;', '', '', ''], $str );
 	}
 }
