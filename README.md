@@ -99,6 +99,7 @@ ini_set('display_errors', 1 );
 
 $data = [
     ['Debug', 123]
-]
+];
+
 SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 ```
