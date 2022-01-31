@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.23 (2022-02-01)
+* fixed dates if year < 1900 and time only cells, thx [fapth](https://github.com/shuchkin/simplexlsxgen/issues/51)   
+
 ## 1.0.22 (2021-10-29)
 * Escape \x00 and \x0B (vertical tab)
 

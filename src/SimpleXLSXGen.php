@@ -110,8 +110,7 @@ class SimpleXLSXGen {
 		// <si><t>Простой шаблон</t></si><si><t>Будем делать генератор</t></si>
 	}
 	public static function fromArray( array $rows, $sheetName = null ) {
-		$xlsx = new static();
-		return $xlsx->addSheet( $rows, $sheetName );
+        return (new static())->addSheet( $rows, $sheetName );
 	}
 
 	public function addSheet( array $rows, $name = null ) {
@@ -136,7 +135,7 @@ class SimpleXLSXGen {
 
 		$this->sheets[$this->curSheet] = ['name' => $name, 'hyperlinks' => []];
 
-		if ( is_array( $rows ) && isset( $rows[0] ) && is_array($rows[0]) ) {
+		if ( isset( $rows[0] ) && is_array($rows[0]) ) {
 			$this->sheets[$this->curSheet]['rows'] = $rows;
 		} else {
 			$this->sheets[$this->curSheet]['rows'] = [];
@@ -511,7 +510,7 @@ class SimpleXLSXGen {
 								$N = self::N_TIME; // time
 							} elseif ( preg_match( '/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
 								$cv = $this->date2excel( $m[1], $m[2], $m[3], $m[4], $m[5], $m[6] );
-								$N = self::N_DATETIME; // [22] m/d/yy h:mm
+								$N = ((int) $m[1] === 0) ? self::N_TIME : self::N_DATETIME; // [22] m/d/yy h:mm
 							} elseif ( preg_match( '/^(\d\d)\/(\d\d)\/(\d\d\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
 								$cv = $this->date2excel( $m[3], $m[2], $m[1], $m[4], $m[5], $m[6] );
 								$N = self::N_DATETIME; // [22] m/d/yy h:mm
@@ -525,6 +524,10 @@ class SimpleXLSXGen {
 								$this->sheets[ $idx ]['hyperlinks'][] = ['ID' => 'rId' . ( count( $this->sheets[ $idx ]['hyperlinks'] ) + 1 ), 'R' => $cname, 'H' => 'mailto:' . $v, 'L' => ''];
 								$F = self::F_HYPERLINK; // Hyperlink
 							}
+                            if ( ($N === self::N_DATE || $N === self::N_DATETIME) && $cv < 0 ) {
+                                $cv = null;
+                                $N = 0;
+                            }
 						}
 						if ( !$cv) {
 
@@ -625,27 +628,28 @@ class SimpleXLSXGen {
 	}
 
 	public function date2excel($year, $month, $day, $hours=0, $minutes=0, $seconds=0) {
+
 	    $excelTime = (($hours * 3600) + ($minutes * 60) + $seconds) / 86400;
 
-	    if ( $year === 0 ) {
+	    if ( (int) $year === 0 ) {
 	        return $excelTime;
         }
 
 		// self::CALENDAR_WINDOWS_1900
 		$excel1900isLeapYear = True;
-		if (((int)$year === 1900) && ($month <= 2)) { $excel1900isLeapYear = False; }
+		if (($year === 1900) && ($month <= 2)) { $excel1900isLeapYear = False; }
 		$myExcelBaseDate = 2415020;
 
-		//    Julian base date Adjustment
+		// Julian base date Adjustment
 		if ($month > 2) {
 			$month -= 3;
 		} else {
 			$month += 9;
 			--$year;
 		}
-		//    Calculate the Julian Date, then subtract the Excel base date (JD 2415020 = 31-Dec-1899 Giving Excel Date of 0)
 		$century = substr($year,0,2);
 		$decade = substr($year,2,2);
+		//    Calculate the Julian Date, then subtract the Excel base date (JD 2415020 = 31-Dec-1899 Giving Excel Date of 0)
 		$excelDate = floor((146097 * $century) / 4) + floor((1461 * $decade) / 4) + floor((153 * $month + 2) / 5) + $day + 1721119 - $myExcelBaseDate + $excel1900isLeapYear;
 
 		return (float) $excelDate + $excelTime;
