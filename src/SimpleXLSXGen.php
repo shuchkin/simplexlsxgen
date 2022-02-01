@@ -15,6 +15,7 @@ class SimpleXLSXGen {
 	protected $F, $F_KEYS; // fonts
 	protected $XF, $XF_KEYS; // cellXfs
 	protected $SI, $SI_KEYS; // shared strings
+  protected $convertDate2Excel = true;
 	const N_NORMAL = 0; // General
 	const N_INT = 1; // 0
 	const N_DEC = 2; // 0.00
@@ -499,22 +500,24 @@ class SimpleXLSXGen {
 							} elseif ( preg_match( '/^([-+]?\d+\.\d+)%$/', $v, $m ) ) {
 								$cv = round( $m[1] / 100, 4 );
 								$N = self::N_PRECENT_DEC; // [10] 0.00%
-							} elseif ( preg_match( '/^(\d\d\d\d)-(\d\d)-(\d\d)$/', $v, $m ) ) {
-								$cv = $this->date2excel( $m[1], $m[2], $m[3] );
-								$N = self::N_DATE; // [14] mm-dd-yy
-							} elseif ( preg_match( '/^(\d\d)\/(\d\d)\/(\d\d\d\d)$/', $v, $m ) ) {
-								$cv = $this->date2excel( $m[3], $m[2], $m[1] );
-								$N = self::N_DATE; // [14] mm-dd-yy
-							} elseif ( preg_match( '/^(\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
-								$cv = $this->date2excel( 0, 0, 0, $m[1], $m[2], $m[3] );
-								$N = self::N_TIME; // time
-							} elseif ( preg_match( '/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
-								$cv = $this->date2excel( $m[1], $m[2], $m[3], $m[4], $m[5], $m[6] );
-								$N = ((int) $m[1] === 0) ? self::N_TIME : self::N_DATETIME; // [22] m/d/yy h:mm
-							} elseif ( preg_match( '/^(\d\d)\/(\d\d)\/(\d\d\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
-								$cv = $this->date2excel( $m[3], $m[2], $m[1], $m[4], $m[5], $m[6] );
-								$N = self::N_DATETIME; // [22] m/d/yy h:mm
-							} elseif ( preg_match( '/^[0-9+-.]+$/', $v ) ) { // Long ?
+							}else if($this->convertDate2Excel){
+                if ( preg_match( '/^(\d\d\d\d)-(\d\d)-(\d\d)$/', $v, $m ) ) {
+                  $cv = $this->date2excel( $m[1], $m[2], $m[3] );
+                  $N = self::N_DATE; // [14] mm-dd-yy
+                } elseif ( preg_match( '/^(\d\d)\/(\d\d)\/(\d\d\d\d)$/', $v, $m ) ) {
+                  $cv = $this->date2excel( $m[3], $m[2], $m[1] );
+                  $N = self::N_DATE; // [14] mm-dd-yy
+                } elseif ( preg_match( '/^(\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
+                  $cv = $this->date2excel( 0, 0, 0, $m[1], $m[2], $m[3] );
+                  $N = self::N_TIME; // time
+                } elseif ( preg_match( '/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
+                  $cv = $this->date2excel( $m[1], $m[2], $m[3], $m[4], $m[5], $m[6] );
+                  $N = ((int) $m[1] === 0) ? self::N_TIME : self::N_DATETIME; // [22] m/d/yy h:mm
+                } elseif ( preg_match( '/^(\d\d)\/(\d\d)\/(\d\d\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m ) ) {
+                  $cv = $this->date2excel( $m[3], $m[2], $m[1], $m[4], $m[5], $m[6] );
+                  $N = self::N_DATETIME; // [22] m/d/yy h:mm
+                }
+              } elseif ( preg_match( '/^[0-9+-.]+$/', $v ) ) { // Long ?
 								$A = self::A_RIGHT;
 							} elseif ( preg_match( '/^https?:\/\/\S+$/i', $v ) ) {
 								$h = explode( '#', $v );
@@ -667,4 +670,12 @@ class SimpleXLSXGen {
 		// but we use fast version
 		return str_replace( ['&', '<', '>', "\x00","\x03","\x0B"], ['&amp;', '&lt;', '&gt;', '', '', ''], $str );
 	}
+
+  public function deactivateDate2Excel(){
+    $this->convertDate2Excel = false;
+  }
+  
+  public function activateDate2Excel(){
+    $this->convertDate2Excel = true;
+  }
 }
