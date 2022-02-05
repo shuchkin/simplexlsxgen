@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.10 (2022-02-05)
+* namespace added, use Shuchkin\SimpleXLSXGen
+
 ## 1.0.23 (2022-02-01)
 * fixed dates if year < 1900 and time only cells, thx [fapth](https://github.com/shuchkin/simplexlsxgen/issues/51)   
 

@@ -1,8 +1,10 @@
 # SimpleXLSXGen
 [<img src="https://img.shields.io/github/license/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/blob/master/license.md) [<img src="https://img.shields.io/github/stars/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/stargazers) [<img src="https://img.shields.io/github/forks/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/network) [<img src="https://img.shields.io/github/issues/shuchkin/simplexlsxgen" />](https://github.com/shuchkin/simplexlsxgen/issues)
 
-Export data to Excel XLSX file. PHP XLSX generator. No external tools and libraries.<br/>
-(!) XLSX reader [here](https://github.com/shuchkin/simplexlsx).  
+Export data to Excel XLSX file. PHP XLSX generator. No external tools and libraries.  
+- XLSX reader [here](https://github.com/shuchkin/simplexlsx)
+- XLS reader [here](https://github.com/shuchkin/simplexls)
+- CSV reader/writer [here](https://github.com/shuchkin/simplecsv)
 
 **Sergey Shuchkin** <sergey.shuchkin@gmail.com> 2020-2021<br/>
 
@@ -15,7 +17,7 @@ $books = [
     [618260307, 'The Hobbit', 'J. R. R. Tolkien', 'Houghton Mifflin', 'USA'],
     [908606664, 'Slinky Malinki', 'Lynley Dodd', 'Mallinson Rendel', 'NZ']
 ];
-$xlsx = SimpleXLSXGen::fromArray( $books );
+$xlsx = Shuchkin\SimpleXLSXGen::fromArray( $books );
 $xlsx->saveAs('books.xlsx'); // or downloadAs('books.xlsx') or $xlsx_content = (string) $xlsx 
 ```
 ![XLSX screenshot](books.png)
@@ -46,7 +48,7 @@ $data = [
     ['Hyperlink + Anchor', '<a href="https://github.com/shuchkin/simplexlsxgen">SimpleXLSXGen</a>'],
     ['RAW string', "\0".'2020-10-04 16:02:00']
 ];
-SimpleXLSXGen::fromArray( $data )->saveAs('datatypes.xlsx');
+Shuchkin\SimpleXLSXGen::fromArray( $data )->saveAs('datatypes.xlsx');
 ```
 ![XLSX screenshot](datatypes.png)
 
@@ -66,7 +68,7 @@ $data = [
     ['Right', '<right>Right Text</right>'],
     ['Center + Bold', '<center><b>Name</b></center>']
 ];
-SimpleXLSXGen::fromArray( $data )
+Shuchkin\SimpleXLSXGen::fromArray( $data )
     ->setDefaultFont( 'Courier New' )
     ->setDefaultFontSize( 14 )
     ->saveAs('styles_and_tags.xlsx');
@@ -76,15 +78,16 @@ SimpleXLSXGen::fromArray( $data )
 ### More examples
 ```php
 // Fluid interface, output to browser for download
-SimpleXLSXGen::fromArray( $books )->downloadAs('table.xlsx');
+Shuchkin\SimpleXLSXGen::fromArray( $books )->downloadAs('table.xlsx');
 
 // Fluid interface, multiple sheets
-SimpleXLSXGen::fromArray( $books )->addSheet( $books2 )->download();
+Shuchkin\SimpleXLSXGen::fromArray( $books )->addSheet( $books2 )->download();
 
 // Alternative interface, sheet name, get xlsx content
-$xlsx_cache = (string) (new SimpleXLSXGen)->addSheet( $books, 'Modern style');
+$xlsx_cache = (string) (new Shuchkin\SimpleXLSXGen)->addSheet( $books, 'Modern style');
 
 // Classic interface
+use Shuchkin\SimpleXLSXGen
 $xlsx = new SimpleXLSXGen();
 $xlsx->addSheet( $books, 'Catalog 2021' );
 $xlsx->addSheet( $books2, 'Stephen King catalog');
@@ -101,5 +104,5 @@ $data = [
     ['Debug', 123]
 ];
 
-SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
+Shuchkin\SimpleXLSXGen::fromArray( $data )->saveAs('debug.xlsx');
 ```

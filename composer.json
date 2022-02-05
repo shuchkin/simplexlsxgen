@@ -17,6 +17,7 @@
     ]
   },
   "require": {
+    "php": ">=5.4",
     "ext-mbstring": "*",
     "ext-zlib": "*"
   }

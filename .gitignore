@@ -1,4 +1,5 @@
-vendor*
+/vendor*
 /books.fw.png
 /datatypes.fw.png
 /styles.fw.png
+/.gitignore
