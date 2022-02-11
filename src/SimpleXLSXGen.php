@@ -126,7 +126,11 @@ class SimpleXLSXGen {
                 $names[ mb_strtoupper( $sh['name']) ] = 1;
             }
             for( $i = 0; $i < 100; $i++ ) {
-                $new_name = ($i === 0) ? $name : $name .' ('.$i.')';
+                $postfix = ' ('.$i.')';
+                $new_name = ($i === 0) ? $name : $name . $postfix;
+                if (mb_strlen($new_name) > 31) {
+                    $new_name = mb_substr($name,0, 31-mb_strlen($postfix)) . $postfix;
+                }
                 $NEW_NAME = mb_strtoupper( $new_name );
                 if ( !isset( $names[ $NEW_NAME ]) ) {
                     $name = $new_name;
