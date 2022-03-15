@@ -66,11 +66,13 @@ $data = [
     ['Left', '<left>12345.67</left>'],
     ['Center', '<center>12345.67</center>'],
     ['Right', '<right>Right Text</right>'],
-    ['Center + Bold', '<center><b>Name</b></center>']
+    ['Center + Bold', '<center><b>Name</b></center>'],
+    ['<center>MERGE CELLS</center>']
 ];
 Shuchkin\SimpleXLSXGen::fromArray( $data )
     ->setDefaultFont( 'Courier New' )
     ->setDefaultFontSize( 14 )
+    ->mergeCells('A13:B13')
     ->saveAs('styles_and_tags.xlsx');
 ```
 ![XLSX screenshot](styles.png)

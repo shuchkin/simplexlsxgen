@@ -39,7 +39,7 @@ class SimpleXLSXGen {
     public function __construct() {
         $this->curSheet = -1;
         $this->defaultFont = 'Calibri';
-        $this->sheets = [ ['name' => 'Sheet1', 'rows' => [], 'hyperlinks' => [] ] ];
+        $this->sheets = [ ['name' => 'Sheet1', 'rows' => [], 'hyperlinks' => [], 'mergecells' => [] ] ];
         $this->SI = [];		// sharedStrings index
         $this->SI_KEYS = []; //  & keys
         $this->F = [ self::F_NORMAL ]; // fonts
@@ -72,7 +72,7 @@ class SimpleXLSXGen {
             'xl/worksheets/sheet1.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-><dimension ref="{REF}"/>{COLS}<sheetData>{ROWS}</sheetData>{HYPERLINKS}</worksheet>',
+><dimension ref="{REF}"/>{COLS}<sheetData>{ROWS}</sheetData>{MERGECELLS}{HYPERLINKS}</worksheet>',
             'xl/worksheets/_rels/sheet1.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{HYPERLINKS}</Relationships>',
             'xl/sharedStrings.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -139,7 +139,7 @@ class SimpleXLSXGen {
             }
         }
 
-        $this->sheets[$this->curSheet] = ['name' => $name, 'hyperlinks' => []];
+        $this->sheets[$this->curSheet] = ['name' => $name, 'hyperlinks' => [], 'mergecells' => []];
 
         if ( isset( $rows[0] ) && is_array($rows[0]) ) {
             $this->sheets[$this->curSheet]['rows'] = $rows;
@@ -440,11 +440,12 @@ class SimpleXLSXGen {
                     if ( !isset($COL[ $CUR_COL ])) {
                         $COL[ $CUR_COL ] = 0;
                     }
+                    $cname = $this->num2name($CUR_COL) . $CUR_ROW;
+
                     if ( $v === null || $v === '' ) {
+                        $row .= '<c r="'.$cname.'"/>';
                         continue;
                     }
-
-                    $cname = $this->num2name($CUR_COL) . $CUR_ROW;
 
                     $ct = $cv = null;
                     $N = $F = $A = 0;
@@ -564,7 +565,7 @@ class SimpleXLSXGen {
                         $cv = $v;
                     } elseif ( $v instanceof \DateTime ) {
                         $vl = 16;
-                        $cv = $this->date2excel( $v->format('Y'), $v->format('m'), $v->format('d'), $v->format('H'), $v->format('i'), $v->format('s') );
+                        $cv = $this->date2excel($v->format('Y'), $v->format('m'), $v->format('d'), $v->format('H'), $v->format('i'), $v->format('s'));
                         $N = self::N_DATETIME; // [22] m/d/yy h:mm
                     } else {
                         continue;
@@ -593,8 +594,8 @@ class SimpleXLSXGen {
                         }
                     }
 
-                    $row .= '<c r="' . $cname . '"'.($ct ? ' t="'.$ct.'"' : '').($cs ? ' s="'.$cs.'"' : '').'>'
-                            .($ct === 'inlineStr' ? '<is><t>'.$cv.'</t></is>' : '<v>' . $cv . '</v>')."</c>\r\n";
+                    $row .= '<c r="' . $cname . '"' . ($ct ? ' t="' . $ct . '"' : '') . ($cs ? ' s="' . $cs . '"' : '') . '>'
+                            . ($ct === 'inlineStr' ? '<is><t>' . $cv . '</t></is>' : '<v>' . $cv . '</v>') . "</c>\r\n";
                 }
                 $ROWS[] = $row . "</row>\r\n";
             }
@@ -602,11 +603,22 @@ class SimpleXLSXGen {
                 $COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.min( $max+1, 60).'" />';
             }
             $COLS[] = '</cols>';
-            $REF = 'A1:'.$this->num2name(count($COLS)) . $CUR_ROW;
+            $REF = 'A1:'.$this->num2name(count($COL)) . $CUR_ROW;
         } else {
             $ROWS[] = '<row r="1"><c r="A1" t="s"><v>0</v></c></row>';
             $REF = 'A1:A1';
         }
+
+        $MERGECELLS = [];
+        if ( count($this->sheets[$idx]['mergecells']) ) {
+            $MERGECELLS[] = '';
+            $MERGECELLS[] = '<mergeCells count="'.count($this->sheets[$idx]['mergecells']).'">';
+            foreach( $this->sheets[$idx]['mergecells'] as $m ) {
+                $MERGECELLS[] = '<mergeCell ref="'.$m.'"/>';
+            }
+            $MERGECELLS[] = '</mergeCells>';
+        }
+
         $HYPERLINKS = [];
         if ( count( $this->sheets[$idx]['hyperlinks']) ) {
             $HYPERLINKS[] = '<hyperlinks>';
@@ -618,8 +630,8 @@ class SimpleXLSXGen {
         //restore locale
         setlocale(LC_NUMERIC, $_loc);
 
-        return str_replace(['{REF}','{COLS}','{ROWS}','{HYPERLINKS}'],
-            [ $REF, implode("\r\n", $COLS), implode("\r\n",$ROWS), implode("\r\n", $HYPERLINKS) ],
+        return str_replace(['{REF}','{COLS}','{ROWS}','{MERGECELLS}','{HYPERLINKS}'],
+            [ $REF, implode("\r\n", $COLS), implode("\r\n",$ROWS), implode("\r\n", $MERGECELLS), implode("\r\n", $HYPERLINKS) ],
             $template );
     }
 
@@ -666,6 +678,10 @@ class SimpleXLSXGen {
     }
     public function setDefaultFontSize( $size ) {
         $this->defaultFontSize = $size;
+        return $this;
+    }
+    public function mergeCells( $range ) {
+        $this->sheets[$this->curSheet]['mergecells'][] = $range;
         return $this;
     }
     public function esc( $str ) {

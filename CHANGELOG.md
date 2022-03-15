@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.1.12 (2022-03-15)
+* Added $xlsx->mergeCells('A1:C1')
+
 ## 1.1.11 (2022-02-05)
 * sheet name maximum length is 31 chars, mb_substr used now
 * license fixed
