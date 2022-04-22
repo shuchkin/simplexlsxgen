@@ -62,6 +62,7 @@ $data = [
     ['Strike', '<s>12345.67</s>'],
     ['Green', '<color rgb="0000FF00">12345.67</color>'],
     ['Bold Red Text', '<b><color rgb="00FF0000">12345.67</color></b>'],
+    ['Blue Text and Yellow Fill', '<fill rgb="00FFFF00"><color rgb="000000FF">12345.67</color></fill>'],
     ['Bold + Italic', '<b><i>12345.67</i></b>'],
     ['Hyperlink', 'https://github.com/shuchkin/simplexlsxgen'],
     ['Italic + Hyperlink + Anchor', '<i><a href="https://github.com/shuchkin/simplexlsxgen">SimpleXLSXGen</a></i>'],
