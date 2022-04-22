@@ -31,6 +31,7 @@ class SimpleXLSXGen {
     const F_ITALIC = 4;
     const F_UNDERLINE = 8;
     const F_STRIKE = 16;
+    const C_NORMAL = 0;
     const A_DEFAULT = 0;
     const A_LEFT = 1;
     const A_RIGHT = 2;
@@ -44,6 +45,9 @@ class SimpleXLSXGen {
         $this->SI_KEYS = []; //  & keys
         $this->F = [ self::F_NORMAL ]; // fonts
         $this->F_KEYS = [0]; // & keys
+        $this->C = [ self::C_NORMAL ]; // 
+        $this->C_KEYS = [0]; // & keys
+
         $this->XF  = [ [self::N_NORMAL, self::F_NORMAL, self::A_DEFAULT] ]; // styles
         $this->XF_KEYS = ['N0F0A0' => 0 ]; // & keys
 
@@ -295,14 +299,15 @@ class SimpleXLSXGen {
                 $entries++;
             } elseif ( $cfilename === 'xl/styles.xml' ) {
                 $FONTS = ['<fonts count="'.count($this->F).'">'];
-                foreach ( $this->F as $f ) {
+                foreach ( $this->F as $index => $f ) {
                     $FONTS[] = '<font><name val="'.$this->defaultFont.'"/><family val="2"/>'
                         . ( $this->defaultFontSize ? '<sz val="'.$this->defaultFontSize.'"/>' : '' )
-                        .( $f & self::F_BOLD ? '<b/>' : '')
+                        .( $f & self::F_UNDERLINE ? '<b/>' : '')
                         .( $f & self::F_ITALIC ? '<i/>' : '')
                         .( $f & self::F_UNDERLINE ? '<u/>' : '')
                         .( $f & self::F_STRIKE ? '<strike/>' : '')
-                        .( $f & self::F_HYPERLINK ? '<color rgb="FF0563C1"/><u/>' : '')
+                        .( $f & self::F_HYPERLINK ? '<color rgb="C2C2C2"/><u/>' : '')
+                        .( isset($this->C[$index]) ? '<color rgb="'.$this->C[$index].'"/>' : '')
                         .'</font>';
                 }
                 $FONTS[] = '</fonts>';
@@ -448,7 +453,7 @@ class SimpleXLSXGen {
                     }
 
                     $ct = $cv = null;
-                    $N = $F = $A = 0;
+                    $N = $F = $A = $C = 0;
 
                     if ( is_string($v) ) {
 
@@ -468,6 +473,10 @@ class SimpleXLSXGen {
                                 }
                                 if ( strpos( $v, '<s>' ) !== false ) {
                                     $F += self::F_STRIKE;
+                                }
+                                if ( strpos( $v, '<color rgb' ) !== false ) {
+                                    preg_match('/(?<=<color rgb=").*?(?=")/', $v, $cValue);
+                                    $C = $cValue[0];
                                 }
                                 if ( strpos( $v, '<left>' ) !== false ) {
                                     $A += self::A_LEFT;
@@ -582,6 +591,7 @@ class SimpleXLSXGen {
                             $cf = count($this->F);
                             $this->F_KEYS[$F] = $cf;
                             $this->F[] = $F;
+                            $this->C[] = $C;
                         }
                         $NFA = 'N' . $N . 'F' . $cf . 'A' . $A;
                         if ( isset( $this->XF_KEYS[ $NFA ] ) ) {
