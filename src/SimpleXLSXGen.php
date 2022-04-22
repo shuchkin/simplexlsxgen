@@ -46,7 +46,6 @@ class SimpleXLSXGen {
         $this->F = [ self::F_NORMAL ]; // fonts
         $this->F_KEYS = [0]; // & keys
         $this->C = [ self::C_NORMAL ]; // 
-        $this->C_KEYS = [0]; // & keys
 
         $this->XF  = [ [self::N_NORMAL, self::F_NORMAL, self::A_DEFAULT, self::C_NORMAL] ]; // styles
         $this->XF_KEYS = ['N0F0A0C0' => 0 ]; // & keys
@@ -561,7 +560,8 @@ class SimpleXLSXGen {
                                 }
                                 if ( $cv === false ) {
                                     $this->SI[] = $v;
-                                    $cv = count( $this->SI ) - 1;                                    $this->SI_KEYS[ $skey ] = $cv;
+                                    $cv = count( $this->SI ) - 1;
+                                    $this->SI_KEYS[ $skey ] = $cv;
                                     $this->SI_KEYS[ $skey ] = $cv;
                                 }
                             }
