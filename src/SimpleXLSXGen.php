@@ -31,7 +31,7 @@ class SimpleXLSXGen {
     const F_ITALIC = 4;
     const F_UNDERLINE = 8;
     const F_STRIKE = 16;
-    const C_NORMAL = 0;
+    const C_NORMAL = 000;
     const A_DEFAULT = 0;
     const A_LEFT = 1;
     const A_RIGHT = 2;
@@ -48,8 +48,8 @@ class SimpleXLSXGen {
         $this->C = [ self::C_NORMAL ]; // 
         $this->C_KEYS = [0]; // & keys
 
-        $this->XF  = [ [self::N_NORMAL, self::F_NORMAL, self::A_DEFAULT] ]; // styles
-        $this->XF_KEYS = ['N0F0A0' => 0 ]; // & keys
+        $this->XF  = [ [self::N_NORMAL, self::F_NORMAL, self::A_DEFAULT, self::C_NORMAL] ]; // styles
+        $this->XF_KEYS = ['N0F0A0C0' => 0 ]; // & keys
 
         $this->template = [
             '_rels/.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -302,11 +302,11 @@ class SimpleXLSXGen {
                 foreach ( $this->F as $index => $f ) {
                     $FONTS[] = '<font><name val="'.$this->defaultFont.'"/><family val="2"/>'
                         . ( $this->defaultFontSize ? '<sz val="'.$this->defaultFontSize.'"/>' : '' )
-                        .( $f & self::F_UNDERLINE ? '<b/>' : '')
+                        .( $f & self::F_BOLD ? '<b/>' : '')
                         .( $f & self::F_ITALIC ? '<i/>' : '')
                         .( $f & self::F_UNDERLINE ? '<u/>' : '')
                         .( $f & self::F_STRIKE ? '<strike/>' : '')
-                        .( $f & self::F_HYPERLINK ? '<color rgb="C2C2C2"/><u/>' : '')
+                        .( $f & self::F_HYPERLINK ? '<u/>' : '')
                         .( isset($this->C[$index]) ? '<color rgb="'.$this->C[$index].'"/>' : '')
                         .'</font>';
                 }
@@ -561,7 +561,7 @@ class SimpleXLSXGen {
                                 }
                                 if ( $cv === false ) {
                                     $this->SI[] = $v;
-                                    $cv = count( $this->SI ) - 1;
+                                    $cv = count( $this->SI ) - 1;                                    $this->SI_KEYS[ $skey ] = $cv;
                                     $this->SI_KEYS[ $skey ] = $cv;
                                 }
                             }
@@ -583,24 +583,24 @@ class SimpleXLSXGen {
                     $COL[ $CUR_COL ] = max( $vl, $COL[ $CUR_COL ] );
 
                     $cs = 0;
-                    if ( $N + $F + $A > 0 ) {
+                    if ( $N + $F + $A > 0 OR $C != 0) {
 
-                        if ( isset($this->F_KEYS[ $F ] ) ) {
-                            $cf = $this->F_KEYS[ $F ];
+                        if ( isset($this->F_KEYS[ $F."-".$C ] ) ) {
+                            $cf = $this->F_KEYS[ $F."-".$C ];
                         } else {
                             $cf = count($this->F);
-                            $this->F_KEYS[$F] = $cf;
+                            $this->F_KEYS[$F."-".$C] = $cf;
                             $this->F[] = $F;
                             $this->C[] = $C;
                         }
-                        $NFA = 'N' . $N . 'F' . $cf . 'A' . $A;
+                        $NFA = 'N' . $N . 'F' . $cf . 'A' . $A . 'C'. $C;
                         if ( isset( $this->XF_KEYS[ $NFA ] ) ) {
                             $cs = $this->XF_KEYS[ $NFA ];
                         }
                         if ( $cs === 0 ) {
                             $cs = count( $this->XF );
                             $this->XF_KEYS[ $NFA ] = $cs;
-                            $this->XF[] = [$N, $cf, $A];
+                            $this->XF[] = [$N, $cf, $A, $C];
                         }
                     }
 
