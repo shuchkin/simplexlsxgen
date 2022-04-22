@@ -575,7 +575,8 @@ class SimpleXLSXGen {
                                 }
                                 if ( $cv === false ) {
                                     $this->SI[] = $v;
-                                    $cv = count( $this->SI ) - 1;                                    $this->SI_KEYS[ $skey ] = $cv;
+                                    $cv = count( $this->SI ) - 1;
+                                    $this->SI_KEYS[ $skey ] = $cv;
                                     $this->SI_KEYS[ $skey ] = $cv;
                                 }
                             }
