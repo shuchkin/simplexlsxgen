@@ -16,6 +16,7 @@ class SimpleXLSXGen {
     protected $template;
     protected $F, $F_KEYS; // fonts
     protected $XF, $XF_KEYS; // cellXfs
+    protected $B, $B_KEYS; // background fills
     protected $SI, $SI_KEYS; // shared strings
     const N_NORMAL = 0; // General
     const N_INT = 1; // 0
@@ -32,6 +33,7 @@ class SimpleXLSXGen {
     const F_UNDERLINE = 8;
     const F_STRIKE = 16;
     const C_NORMAL = 0;
+    const B_NORMAL = 0;
     const A_DEFAULT = 0;
     const A_LEFT = 1;
     const A_RIGHT = 2;
@@ -46,9 +48,9 @@ class SimpleXLSXGen {
         $this->F = [ self::F_NORMAL ]; // fonts
         $this->F_KEYS = [0]; // & keys
         $this->C = [ self::C_NORMAL ]; // 
-
-        $this->XF  = [ [self::N_NORMAL, self::F_NORMAL, self::A_DEFAULT, self::C_NORMAL] ]; // styles
-        $this->XF_KEYS = ['N0F0A0C0' => 0 ]; // & keys
+        $this->B = [ self::B_NORMAL ]; // 
+        $this->XF  = [ [self::N_NORMAL, self::F_NORMAL, self::A_DEFAULT, self::C_NORMAL, self::B_NORMAL] ]; // styles
+        $this->XF_KEYS = ['N0F0A0C0B0' => 0 ]; // & keys
 
         $this->template = [
             '_rels/.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -83,7 +85,7 @@ class SimpleXLSXGen {
             'xl/styles.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
 {FONTS}
-<fills count="1"><fill><patternFill patternType="none"/></fill></fills>
+{FILLS}
 <borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders>
 <cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" /></cellStyleXfs>
 {XF}
@@ -315,13 +317,22 @@ class SimpleXLSXGen {
                     $align = ($xf[2] === self::A_LEFT ? ' applyAlignment="1"><alignment horizontal="left"/>' : '')
                         .($xf[2] === self::A_RIGHT ? ' applyAlignment="1"><alignment horizontal="right"/>' : '')
                         .($xf[2] === self::A_CENTER ? ' applyAlignment="1"><alignment horizontal="center"/>' : '');
-                    $XF[] = '<xf numFmtId="'.$xf[0].'" fontId="'.$xf[1].'" fillId="0" borderId="0" xfId="0"'
+                    $XF[] = '<xf numFmtId="'.$xf[0].'" fontId="'.$xf[1].'" fillId="'.$xf[4].'" borderId="0" xfId="0"'
                         .($xf[0] > 0 ? ' applyNumberFormat="1"' : '')
                         .($align ? $align . '</xf>' : '/>');
 
                 }
                 $XF[] = '</cellXfs>';
-                $template = str_replace(['{FONTS}','{XF}'], [implode("\r\n", $FONTS), implode("\r\n", $XF)], $template);
+                $FILLS = ['<fills count="'.count($this->B).'">'];
+                foreach( $this->B as $fill){
+                    if($fill===0){
+                        $FILLS[] = '<fill><patternFill patternType="none"></patternFill></fill>';
+                    } else {
+                        $FILLS[] = '<fill><patternFill patternType="solid"><fgColor rgb="'.$fill.'"/><bgColor indexed="64"/></patternFill></fill>';
+                    }
+                }
+                $FILLS[] = '</fills>';
+                $template = str_replace(['{FONTS}','{XF}','{FILLS}'], [implode("\r\n", $FONTS), implode("\r\n", $XF), implode("\r\n", $FILLS)], $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
             } else {
@@ -452,7 +463,7 @@ class SimpleXLSXGen {
                     }
 
                     $ct = $cv = null;
-                    $N = $F = $A = $C = 0;
+                    $N = $F = $A = $C = $B =  0;
 
                     if ( is_string($v) ) {
 
@@ -476,6 +487,10 @@ class SimpleXLSXGen {
                                 if ( strpos( $v, '<color rgb' ) !== false ) {
                                     preg_match('/(?<=<color rgb=").*?(?=")/', $v, $cValue);
                                     $C = $cValue[0];
+                                }
+                                if ( strpos( $v, '<fill rgb' ) !== false ) {
+                                    preg_match('/(?<=<fill rgb=").*?(?=")/', $v, $bValue);
+                                    $B = $bValue[0];
                                 }
                                 if ( strpos( $v, '<left>' ) !== false ) {
                                     $A += self::A_LEFT;
@@ -560,8 +575,7 @@ class SimpleXLSXGen {
                                 }
                                 if ( $cv === false ) {
                                     $this->SI[] = $v;
-                                    $cv = count( $this->SI ) - 1;
-                                    $this->SI_KEYS[ $skey ] = $cv;
+                                    $cv = count( $this->SI ) - 1;                                    $this->SI_KEYS[ $skey ] = $cv;
                                     $this->SI_KEYS[ $skey ] = $cv;
                                 }
                             }
@@ -583,7 +597,7 @@ class SimpleXLSXGen {
                     $COL[ $CUR_COL ] = max( $vl, $COL[ $CUR_COL ] );
 
                     $cs = 0;
-                    if ( $N + $F + $A > 0 OR $C != 0) {
+                    if ( $N + $F + $A > 0 OR $C != 0 OR $B !=0) {
 
                         if ( isset($this->F_KEYS[ $F."-".$C ] ) ) {
                             $cf = $this->F_KEYS[ $F."-".$C ];
@@ -593,14 +607,21 @@ class SimpleXLSXGen {
                             $this->F[] = $F;
                             $this->C[] = $C;
                         }
-                        $NFA = 'N' . $N . 'F' . $cf . 'A' . $A . 'C'. $C;
+                        if ( isset($this->B_KEYS[ $B ] ) ) {
+                            $bk = $this->B_KEYS[ $B ];
+                        } else {
+                            $bk = count($this->B);
+                            $this->B_KEYS[$B] = $bk;
+                            $this->B[] = $B;
+                        }
+                        $NFA = 'N' . $N . 'F' . $cf . 'A' . $A . 'C'. $C . 'B' . $bk;
                         if ( isset( $this->XF_KEYS[ $NFA ] ) ) {
                             $cs = $this->XF_KEYS[ $NFA ];
                         }
                         if ( $cs === 0 ) {
                             $cs = count( $this->XF );
                             $this->XF_KEYS[ $NFA ] = $cs;
-                            $this->XF[] = [$N, $cf, $A, $C];
+                            $this->XF[] = [$N, $cf, $A, $C, $bk];
                         }
                     }
 
