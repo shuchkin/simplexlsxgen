@@ -31,7 +31,7 @@ class SimpleXLSXGen {
     const F_ITALIC = 4;
     const F_UNDERLINE = 8;
     const F_STRIKE = 16;
-    const C_NORMAL = 000;
+    const C_NORMAL = 0;
     const A_DEFAULT = 0;
     const A_LEFT = 1;
     const A_RIGHT = 2;
