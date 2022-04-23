@@ -484,13 +484,15 @@ class SimpleXLSXGen {
                                 if ( strpos( $v, '<s>' ) !== false ) {
                                     $F += self::F_STRIKE;
                                 }
-                                if ( strpos( $v, '<color rgb' ) !== false ) {
-                                    preg_match('/(?<=<color rgb=").*?(?=")/', $v, $cValue);
-                                    $C = $cValue[0];
-                                }
-                                if ( strpos( $v, '<fill rgb' ) !== false ) {
-                                    preg_match('/(?<=<fill rgb=").*?(?=")/', $v, $bValue);
-                                    $B = $bValue[0];
+                                if ( strpos( $v, '<style' ) !== false ) {
+                                    preg_match('/(?<= color=").*?(?=")/', $v, $cValue);
+                                    if(!empty($cValue)){
+                                        $C = $cValue[0];
+                                    }
+                                    preg_match('/(?<= bgcolor=").*?(?=")/', $v, $bValue);
+                                    if(!empty($bValue)){
+                                        $B = $bValue[0];
+                                    }
                                 }
                                 if ( strpos( $v, '<left>' ) !== false ) {
                                     $A += self::A_LEFT;
