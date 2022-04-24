@@ -60,22 +60,22 @@ $data = [
     ['Italic', '<i>12345.67</i>'],
     ['Underline', '<u>12345.67</u>'],
     ['Strike', '<s>12345.67</s>'],
-    ['Green', '<style color="0000FF00">12345.67</style>'],
-    ['Bold Red Text', '<b><style color="00FF0000">12345.67</style></b>'],
-    ['Blue Text and Yellow Fill', '<style bgcolor="00FFFF00" color="000000FF">12345.67</style>'],
     ['Bold + Italic', '<b><i>12345.67</i></b>'],
     ['Hyperlink', 'https://github.com/shuchkin/simplexlsxgen'],
     ['Italic + Hyperlink + Anchor', '<i><a href="https://github.com/shuchkin/simplexlsxgen">SimpleXLSXGen</a></i>'],
+    ['Green', '<style color="#00FF00">12345.67</style>'],
+    ['Bold Red Text', '<b><style color="#FF0000">12345.67</style></b>'],
+    ['Blue Text and Yellow Fill', '<style bgcolor="#FFFF00" color="#0000FF">12345.67</style>'],
     ['Left', '<left>12345.67</left>'],
     ['Center', '<center>12345.67</center>'],
     ['Right', '<right>Right Text</right>'],
     ['Center + Bold', '<center><b>Name</b></center>'],
-    ['<center>MERGE CELLS</center>']
+    ['<center>MERGE CELLS</center>', null]
 ];
-Shuchkin\SimpleXLSXGen::fromArray( $data )
+SimpleXLSXGen::fromArray( $data )
     ->setDefaultFont( 'Courier New' )
     ->setDefaultFontSize( 14 )
-    ->mergeCells('A13:B13')
+    ->mergeCells('A16:B16')
     ->saveAs('styles_and_tags.xlsx');
 ```
 ![XLSX screenshot](styles.png)

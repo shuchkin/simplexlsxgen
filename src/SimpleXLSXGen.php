@@ -1,4 +1,9 @@
-<?php
+<?php /** @noinspection ReturnTypeCanBeDeclaredInspection */
+/** @noinspection PhpMissingReturnTypeInspection */
+/** @noinspection NullCoalescingOperatorCanBeUsedInspection */
+
+/** @noinspection PhpIssetCanBeReplacedWithCoalesceInspection */
+
 namespace Shuchkin;
 
 /**
@@ -14,9 +19,7 @@ class SimpleXLSXGen {
     protected $defaultFontSize;
     protected $sheets;
     protected $template;
-    protected $F, $F_KEYS; // fonts
     protected $XF, $XF_KEYS; // cellXfs
-    protected $B, $B_KEYS; // background fills
     protected $SI, $SI_KEYS; // shared strings
     const N_NORMAL = 0; // General
     const N_INT = 1; // 0
@@ -32,8 +35,14 @@ class SimpleXLSXGen {
     const F_ITALIC = 4;
     const F_UNDERLINE = 8;
     const F_STRIKE = 16;
-    const C_NORMAL = 0;
-    const B_NORMAL = 0;
+    const F_COLOR = 32;
+    const FL_NONE = 0; // none
+    const FL_SOLID = 1; // solid
+    const FL_MEDIUM_GRAY = 2; // mediumGray
+    const FL_DARK_GRAY = 4; // darkGray
+	const FL_LIGHT_GRAY = 8; // lightGray
+    const FL_GRAY_125 = 16; // gray125
+    const FL_COLOR = 32;
     const A_DEFAULT = 0;
     const A_LEFT = 1;
     const A_RIGHT = 2;
@@ -45,12 +54,12 @@ class SimpleXLSXGen {
         $this->sheets = [ ['name' => 'Sheet1', 'rows' => [], 'hyperlinks' => [], 'mergecells' => [] ] ];
         $this->SI = [];		// sharedStrings index
         $this->SI_KEYS = []; //  & keys
-        $this->F = [ self::F_NORMAL ]; // fonts
-        $this->F_KEYS = [0]; // & keys
-        $this->C = [ self::C_NORMAL ]; // 
-        $this->B = [ self::B_NORMAL ]; // 
-        $this->XF  = [ [self::N_NORMAL, self::F_NORMAL, self::A_DEFAULT, self::C_NORMAL, self::B_NORMAL] ]; // styles
-        $this->XF_KEYS = ['N0F0A0C0B0' => 0 ]; // & keys
+        $this->XF  = [  // styles
+            [self::N_NORMAL, self::A_DEFAULT, self::F_NORMAL, self::FL_NONE, 0, 0],
+            [self::N_NORMAL, self::A_DEFAULT, self::F_NORMAL, self::FL_GRAY_125, 0, 0], // hack
+        ];
+        $this->XF_KEYS['0-0-0-0-0-0'] = 0; // & keys
+        $this->XF_KEYS['0-0-0-16-0-0'] = 1;
 
         $this->template = [
             '_rels/.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -299,39 +308,63 @@ class SimpleXLSXGen {
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
             } elseif ( $cfilename === 'xl/styles.xml' ) {
-                $FONTS = ['<fonts count="'.count($this->F).'">'];
-                foreach ( $this->F as $index => $f ) {
-                    $FONTS[] = '<font><name val="'.$this->defaultFont.'"/><family val="2"/>'
-                        . ( $this->defaultFontSize ? '<sz val="'.$this->defaultFontSize.'"/>' : '' )
-                        .( $f & self::F_BOLD ? '<b/>' : '')
-                        .( $f & self::F_ITALIC ? '<i/>' : '')
-                        .( $f & self::F_UNDERLINE ? '<u/>' : '')
-                        .( $f & self::F_STRIKE ? '<strike/>' : '')
-                        .( $f & self::F_HYPERLINK ? '<u/>' : '')
-                        .( isset($this->C[$index]) ? '<color rgb="'.$this->C[$index].'"/>' : '')
-                        .'</font>';
-                }
-                $FONTS[] = '</fonts>';
-                $XF = ['<cellXfs count="'.count($this->XF).'">'];
+                $XF = $FONTS = $F_KEYS = $FILLS = $FL_KEYS = [];
+//                print_r( $this->XF );
                 foreach( $this->XF as $xf ) {
-                    $align = ($xf[2] === self::A_LEFT ? ' applyAlignment="1"><alignment horizontal="left"/>' : '')
-                        .($xf[2] === self::A_RIGHT ? ' applyAlignment="1"><alignment horizontal="right"/>' : '')
-                        .($xf[2] === self::A_CENTER ? ' applyAlignment="1"><alignment horizontal="center"/>' : '');
-                    $XF[] = '<xf numFmtId="'.$xf[0].'" fontId="'.$xf[1].'" fillId="'.$xf[4].'" borderId="0" xfId="0"'
+                    // 0 - num fmt, 1 - align, 2 - font, 3 - fill, 4 - font color, 5 - bgcolor
+                    // fonts
+                    $F_KEY = $xf[2].'-'.$xf[4];
+                    if ( isset($F_KEYS[ $F_KEY ]) ) {
+                        $F_ID = $F_KEYS[ $F_KEY ];
+                    } else {
+                        $F_ID = $F_KEYS[ $F_KEY ] = count( $FONTS );
+
+                        $FONTS[] = '<font><name val="'.$this->defaultFont.'"/><family val="2"/>'
+                            . ( $this->defaultFontSize ? '<sz val="'.$this->defaultFontSize.'"/>' : '' )
+                            .( $xf[2] & self::F_BOLD ? '<b/>' : '')
+                            .( $xf[2] & self::F_ITALIC ? '<i/>' : '')
+                            .( $xf[2] & self::F_UNDERLINE ? '<u/>' : '')
+                            .( $xf[2] & self::F_STRIKE ? '<strike/>' : '')
+                            .( $xf[2] & self::F_HYPERLINK ? '<u/>' : '')
+                            .( $xf[2] & self::F_COLOR ? '<color rgb="'.$xf[4].'"/>' : '')
+                            .'</font>';
+                    }
+                    // fills
+                    $FL_KEY = $xf[3].'-'.$xf[5];
+                    if (isset($FL_KEYS[$FL_KEY])) {
+                        $FL_ID = $FL_KEYS[ $FL_KEY ];
+                    } else {
+                        $FL_ID = $FL_KEYS[ $FL_KEY ] = count($FILLS);
+                        $FILLS[] = '<fill><patternFill patternType="'
+                            .( $xf[3] === 0 ? 'none' : '')
+                            .( $xf[3] & self::FL_SOLID ? 'solid' : '')
+                            .( $xf[3] & self::FL_MEDIUM_GRAY ? 'mediumGray' : '')
+                            .( $xf[3] & self::FL_DARK_GRAY ? 'darkGray' : '')
+                            .( $xf[3] & self::FL_LIGHT_GRAY ? 'lightGray' : '')
+                            .( $xf[3] & self::FL_GRAY_125 ? 'gray125' : '')
+                            .'"'
+                            .( $xf[3] & self::FL_COLOR ? '><fgColor rgb="'.$xf[5].'"/><bgColor indexed="64"/></patternFill>' : ' />')
+                            .'</fill>';
+                    }
+                    $align = ($xf[1] === self::A_LEFT ? ' applyAlignment="1"><alignment horizontal="left"/>' : '')
+                        .($xf[1] === self::A_RIGHT ? ' applyAlignment="1"><alignment horizontal="right"/>' : '')
+                        .($xf[1] === self::A_CENTER ? ' applyAlignment="1"><alignment horizontal="center"/>' : '');
+
+                    $XF[] = '<xf numFmtId="'.$xf[0].'" fontId="'.$F_ID.'" fillId="'.$FL_ID.'" borderId="0" xfId="0"'
                         .($xf[0] > 0 ? ' applyNumberFormat="1"' : '')
+                        .($F_ID > 0 ? ' applyFont="1"' : '')
+                        .($FL_ID > 0 ? ' applyFill="1"' : '')
                         .($align ? $align . '</xf>' : '/>');
 
                 }
+                // wrap collections
+                array_unshift( $XF, '<cellXfs count="'.count($XF).'">');
                 $XF[] = '</cellXfs>';
-                $FILLS = ['<fills count="'.count($this->B).'">'];
-                foreach( $this->B as $fill){
-                    if($fill===0){
-                        $FILLS[] = '<fill><patternFill patternType="none"></patternFill></fill>';
-                    } else {
-                        $FILLS[] = '<fill><patternFill patternType="solid"><fgColor rgb="'.$fill.'"/><bgColor indexed="64"/></patternFill></fill>';
-                    }
-                }
+                array_unshift($FONTS, '<fonts count="'.count($FONTS).'">');
+                $FONTS[] = '</fonts>';
+                array_unshift($FILLS, '<fills count="'.count($FILLS).'">');
                 $FILLS[] = '</fills>';
+
                 $template = str_replace(['{FONTS}','{XF}','{FILLS}'], [implode("\r\n", $FONTS), implode("\r\n", $XF), implode("\r\n", $FILLS)], $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
@@ -463,7 +496,7 @@ class SimpleXLSXGen {
                     }
 
                     $ct = $cv = null;
-                    $N = $F = $A = $C = $B =  0;
+                    $N = $A = $F = $FL = $C = $B = 0;
 
                     if ( is_string($v) ) {
 
@@ -484,14 +517,16 @@ class SimpleXLSXGen {
                                 if ( strpos( $v, '<s>' ) !== false ) {
                                     $F += self::F_STRIKE;
                                 }
-                                if ( strpos( $v, '<style' ) !== false ) {
-                                    preg_match('/(?<= color=").*?(?=")/', $v, $cValue);
-                                    if(!empty($cValue)){
-                                        $C = $cValue[0];
+                                if ( preg_match('/<style([^>]+)>/', $v, $m ) ) {
+
+                                    if ( preg_match('/ color="([^"]+)"/', $m[1], $m2) ) {
+
+                                        $F += self::F_COLOR;
+                                        $C = strlen($m2[1]) === 8 ? $m2[1] : ('FF' . ltrim($m2[1],'#'));
                                     }
-                                    preg_match('/(?<= bgcolor=").*?(?=")/', $v, $bValue);
-                                    if(!empty($bValue)){
-                                        $B = $bValue[0];
+                                    if ( preg_match('/ bgcolor="([^"]+)"/', $m[1], $m2) ) {
+                                        $FL += self::FL_COLOR;
+                                        $B = strlen($m2[1]) === 8 ? $m2[1] : ('FF' . ltrim($m2[1],'#'));
                                     }
                                 }
                                 if ( strpos( $v, '<left>' ) !== false ) {
@@ -506,11 +541,11 @@ class SimpleXLSXGen {
                                 if ( preg_match( '/<a href="(https?:\/\/[^"]+)">(.*?)<\/a>/i', $v, $m ) ) {
                                     $h = explode( '#', $m[1] );
                                     $this->sheets[ $idx ]['hyperlinks'][] = ['ID' => 'rId' . ( count( $this->sheets[ $idx ]['hyperlinks'] ) + 1 ), 'R' => $cname, 'H' => $h[0], 'L' => isset( $h[1] ) ? $h[1] : ''];
-                                    $F = self::F_HYPERLINK; // Hyperlink
+                                    $F += self::F_HYPERLINK; // Hyperlink
                                 }
                                 if ( preg_match( '/<a href="(mailto?:[^"]+)">(.*?)<\/a>/i', $v, $m ) ) {
                                     $this->sheets[ $idx ]['hyperlinks'][] = ['ID' => 'rId' . ( count( $this->sheets[ $idx ]['hyperlinks'] ) + 1 ), 'R' => $cname, 'H' => $m[1], 'L' => ''];
-                                    $F = self::F_HYPERLINK; // mailto hyperlink
+                                    $F += self::F_HYPERLINK; // mailto hyperlink
                                 }
                                 $v = strip_tags( $v );
                             } // tags
@@ -547,14 +582,14 @@ class SimpleXLSXGen {
                                 $cv = $this->date2excel( $m[3], $m[2], $m[1], $m[4], $m[5], $m[6] );
                                 $N = self::N_DATETIME; // [22] m/d/yy h:mm
                             } elseif ( preg_match( '/^[0-9+-.]+$/', $v ) ) { // Long ?
-                                $A = self::A_RIGHT;
+                                $A += self::A_RIGHT;
                             } elseif ( preg_match( '/^https?:\/\/\S+$/i', $v ) ) {
                                 $h = explode( '#', $v );
                                 $this->sheets[ $idx ]['hyperlinks'][] = ['ID' => 'rId' . ( count( $this->sheets[ $idx ]['hyperlinks'] ) + 1 ), 'R' => $cname, 'H' => $h[0], 'L' => isset( $h[1] ) ? $h[1] : ''];
-                                $F = self::F_HYPERLINK; // Hyperlink
+                                $F += self::F_HYPERLINK; // Hyperlink
                             } elseif ( preg_match( "/^[a-zA-Z0-9_\.\-]+@([a-zA-Z0-9][a-zA-Z0-9\-]*\.)+[a-zA-Z]{2,}$/", $v ) ) {
                                 $this->sheets[ $idx ]['hyperlinks'][] = ['ID' => 'rId' . ( count( $this->sheets[ $idx ]['hyperlinks'] ) + 1 ), 'R' => $cname, 'H' => 'mailto:' . $v, 'L' => ''];
-                                $F = self::F_HYPERLINK; // Hyperlink
+                                $F += self::F_HYPERLINK; // Hyperlink
                             }
                             if ( ($N === self::N_DATE || $N === self::N_DATETIME) && $cv < 0 ) {
                                 $cv = null;
@@ -599,31 +634,26 @@ class SimpleXLSXGen {
                     $COL[ $CUR_COL ] = max( $vl, $COL[ $CUR_COL ] );
 
                     $cs = 0;
-                    if ( $N + $F + $A > 0 OR $C != 0 OR $B !=0) {
 
-                        if ( isset($this->F_KEYS[ $F."-".$C ] ) ) {
-                            $cf = $this->F_KEYS[ $F."-".$C ];
-                        } else {
-                            $cf = count($this->F);
-                            $this->F_KEYS[$F."-".$C] = $cf;
-                            $this->F[] = $F;
-                            $this->C[] = $C;
+                    if ( $N + $A + $F + $FL > 0 ) {
+
+                        if ( $FL === self::FL_COLOR ) {
+                            $FL += self::FL_SOLID;
                         }
-                        if ( isset($this->B_KEYS[ $B ] ) ) {
-                            $bk = $this->B_KEYS[ $B ];
-                        } else {
-                            $bk = count($this->B);
-                            $this->B_KEYS[$B] = $bk;
-                            $this->B[] = $B;
+                        if ( ($F & self::F_HYPERLINK) && !($F & self::F_COLOR)) {
+                            $F += self::F_COLOR;
+                            $C = 'FF0563C1';
                         }
-                        $NFA = 'N' . $N . 'F' . $cf . 'A' . $A . 'C'. $C . 'B' . $bk;
-                        if ( isset( $this->XF_KEYS[ $NFA ] ) ) {
-                            $cs = $this->XF_KEYS[ $NFA ];
+
+                        $XF_KEY = $N . '-' . $A  . '-' . $F. '-'. $FL . '-' . $C . '-' . $B;
+//                        echo $cname .'='.$XF_KEY.PHP_EOL;
+                        if ( isset( $this->XF_KEYS[ $XF_KEY ] ) ) {
+                            $cs = $this->XF_KEYS[ $XF_KEY ];
                         }
                         if ( $cs === 0 ) {
                             $cs = count( $this->XF );
-                            $this->XF_KEYS[ $NFA ] = $cs;
-                            $this->XF[] = [$N, $cf, $A, $C, $bk];
+                            $this->XF_KEYS[ $XF_KEY ] = $cs;
+                            $this->XF[] = [$N, $A, $F, $FL, $C, $B];
                         }
                     }
 
