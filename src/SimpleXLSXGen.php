@@ -481,8 +481,9 @@ class SimpleXLSXGen {
             $COL = [];
             foreach( $this->sheets[$idx]['rows'] as $r ) {
                 $CUR_ROW++;
-                $row = '<row r="'.$CUR_ROW.'">';
+                $row = '';
                 $CUR_COL = 0;
+                $RH = 0; // row height
                 foreach( $r as $v ) {
                     $CUR_COL++;
                     if ( !isset($COL[ $CUR_COL ])) {
@@ -527,6 +528,9 @@ class SimpleXLSXGen {
                                     if ( preg_match('/ bgcolor="([^"]+)"/', $m[1], $m2) ) {
                                         $FL += self::FL_COLOR;
                                         $B = strlen($m2[1]) === 8 ? $m2[1] : ('FF' . ltrim($m2[1],'#'));
+                                    }
+                                    if ( preg_match('/ height="([^"]+)"/', $m[1], $m2) ) {
+                                        $RH = $m2[1];
                                     }
                                 }
                                 if ( strpos( $v, '<left>' ) !== false ) {
@@ -660,7 +664,7 @@ class SimpleXLSXGen {
                     $row .= '<c r="' . $cname . '"' . ($ct ? ' t="' . $ct . '"' : '') . ($cs ? ' s="' . $cs . '"' : '') . '>'
                             . ($ct === 'inlineStr' ? '<is><t>' . $cv . '</t></is>' : '<v>' . $cv . '</v>') . "</c>\r\n";
                 }
-                $ROWS[] = $row . "</row>\r\n";
+                $ROWS[] = '<row r="'.$CUR_ROW.'"'.($RH ? ' customHeight="1" ht="'.$RH.'"' : '').'>'.$row . "</row>";
             }
             foreach ( $COL as $k => $max ) {
                 $COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.min( $max+1, 60).'" />';
