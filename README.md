@@ -6,7 +6,7 @@ Export data to Excel XLSX file. PHP XLSX generator. No external tools and librar
 - XLS reader [here](https://github.com/shuchkin/simplexls)
 - CSV reader/writer [here](https://github.com/shuchkin/simplecsv)
 
-**Sergey Shuchkin** <sergey.shuchkin@gmail.com> 2020-2021<br/>
+**Sergey Shuchkin** <sergey.shuchkin@gmail.com> 2020-2022<br/>
 
 *Hey, bro, please ★ the package for my motivation :) and [donate](https://opencollective.com/simplexlsx) for more motivation!* 
 
@@ -70,12 +70,16 @@ $data = [
     ['Center', '<center>12345.67</center>'],
     ['Right', '<right>Right Text</right>'],
     ['Center + Bold', '<center><b>Name</b></center>'],
-    ['<center>MERGE CELLS</center>', null]
+    ['Row height', '<style height="50">Row Height = 50</style>'],
+    ['Top', '<style height="50"><top>Top</top></style>'],
+    ['Middle + Center', '<style height="50"><middle><center>Middle + Center</center></middle></style>'],
+    ['Bottom + Right', '<style height="50"><bottom><right>Bottom + Right</right></bottom></style>'],
+    ['<center>MERGE CELLS</center>', null],
 ];
 SimpleXLSXGen::fromArray( $data )
     ->setDefaultFont( 'Courier New' )
     ->setDefaultFontSize( 14 )
-    ->mergeCells('A16:B16')
+    ->mergeCells('A20:B20')
     ->saveAs('styles_and_tags.xlsx');
 ```
 ![XLSX screenshot](styles.png)

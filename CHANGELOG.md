@@ -1,10 +1,11 @@
 # Changelog
 
-## 1.2.11 (2022-)
-* Row height `&lt;style height="50"&gt;Custom row height 50&lt;/style&gt;` 
+## 1.2.11 (2022-05-17)
+* Row height `<style height="50">Custom row height 50</style>`
+* Vertical align `<bottom>12345</bottom>`
 
 ## 1.2.10 (2022-04-24)
-* Added colors `&lt;style color="#FFFF00" bgcolor="#00FF00"&gt;Yellow text on blue background&lt;/style&gt;`, thx [mrjemson](https://github.com/mrjemson)
+* Added colors `<style color="#FFFF00" bgcolor="#00FF00">Yellow text on blue background</style>`, thx [mrjemson](https://github.com/mrjemson)
 
 ## 1.1.12 (2022-03-15)
 * Added `$xlsx->mergeCells('A1:C1')`

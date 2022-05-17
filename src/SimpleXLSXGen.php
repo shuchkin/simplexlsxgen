@@ -46,7 +46,10 @@ class SimpleXLSXGen {
     const A_DEFAULT = 0;
     const A_LEFT = 1;
     const A_RIGHT = 2;
-    const A_CENTER = 3;
+    const A_CENTER = 4;
+    const A_TOP = 8;
+    const A_MIDDLE = 16;
+    const A_BOTTOM = 32;
 
     public function __construct() {
         $this->curSheet = -1;
@@ -346,15 +349,18 @@ class SimpleXLSXGen {
                             .( $xf[3] & self::FL_COLOR ? '><fgColor rgb="'.$xf[5].'"/><bgColor indexed="64"/></patternFill>' : ' />')
                             .'</fill>';
                     }
-                    $align = ($xf[1] === self::A_LEFT ? ' applyAlignment="1"><alignment horizontal="left"/>' : '')
-                        .($xf[1] === self::A_RIGHT ? ' applyAlignment="1"><alignment horizontal="right"/>' : '')
-                        .($xf[1] === self::A_CENTER ? ' applyAlignment="1"><alignment horizontal="center"/>' : '');
+                    $align = ($xf[1] & self::A_LEFT ? ' horizontal="left"' : '')
+                        .($xf[1] & self::A_RIGHT ? ' horizontal="right"' : '')
+                        .($xf[1] & self::A_CENTER ? ' horizontal="center"' : '')
+                        .($xf[1] & self::A_TOP ? ' vertical="top"' : '')
+                        .($xf[1] & self::A_MIDDLE ? ' vertical="center"' : '')
+                        .($xf[1] & self::A_BOTTOM ? ' vertical="bottom"' : '');
 
                     $XF[] = '<xf numFmtId="'.$xf[0].'" fontId="'.$F_ID.'" fillId="'.$FL_ID.'" borderId="0" xfId="0"'
                         .($xf[0] > 0 ? ' applyNumberFormat="1"' : '')
                         .($F_ID > 0 ? ' applyFont="1"' : '')
                         .($FL_ID > 0 ? ' applyFill="1"' : '')
-                        .($align ? $align . '</xf>' : '/>');
+                        .($align ? ' applyAlignment="1"><alignment'.$align . '/></xf>' : '/>');
 
                 }
                 // wrap collections
@@ -541,6 +547,15 @@ class SimpleXLSXGen {
                                 }
                                 if ( strpos( $v, '<right>' ) !== false ) {
                                     $A += self::A_RIGHT;
+                                }
+                                if ( strpos( $v, '<top>' ) !== false ) {
+                                    $A += self::A_TOP;
+                                }
+                                if ( strpos( $v, '<middle>' ) !== false ) {
+                                    $A += self::A_MIDDLE;
+                                }
+                                if ( strpos( $v, '<bottom>' ) !== false ) {
+                                    $A += self::A_BOTTOM;
                                 }
                                 if ( preg_match( '/<a href="(https?:\/\/[^"]+)">(.*?)<\/a>/i', $v, $m ) ) {
                                     $h = explode( '#', $m[1] );
