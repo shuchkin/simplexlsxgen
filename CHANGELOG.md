@@ -1,8 +1,11 @@
 # Changelog
 
-## 1.2.11 (2022-05-17)
+## 1.2.12 (2022-05-17)
+* Vertical align (tags top,middle,bottom) `<bottom>12345</bottom>`
+
+## 1.2.11 (2022-05-01)
 * Row height `<style height="50">Custom row height 50</style>`
-* Vertical align `<bottom>12345</bottom>`
+
 
 ## 1.2.10 (2022-04-24)
 * Added colors `<style color="#FFFF00" bgcolor="#00FF00">Yellow text on blue background</style>`, thx [mrjemson](https://github.com/mrjemson)
