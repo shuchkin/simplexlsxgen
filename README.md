@@ -74,11 +74,12 @@ $data = [
     ['Top', '<style height="50"><top>Top</top></style>'],
     ['Middle + Center', '<style height="50"><middle><center>Middle + Center</center></middle></style>'],
     ['Bottom + Right', '<style height="50"><bottom><right>Bottom + Right</right></bottom></style>'],
-    ['<center>MERGE CELLS</center>', null],
+    ['<center>MERGE CELLS MERGE CELLS MERGE CELLS MERGE CELLS MERGE CELLS</center>', null],
 ];
 SimpleXLSXGen::fromArray( $data )
     ->setDefaultFont( 'Courier New' )
     ->setDefaultFontSize( 14 )
+    ->setColWidth(1, 35)
     ->mergeCells('A20:B20')
     ->saveAs('styles_and_tags.xlsx');
 ```

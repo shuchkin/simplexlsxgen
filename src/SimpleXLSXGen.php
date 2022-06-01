@@ -54,7 +54,7 @@ class SimpleXLSXGen {
     public function __construct() {
         $this->curSheet = -1;
         $this->defaultFont = 'Calibri';
-        $this->sheets = [ ['name' => 'Sheet1', 'rows' => [], 'hyperlinks' => [], 'mergecells' => [] ] ];
+        $this->sheets = [ ['name' => 'Sheet1', 'rows' => [], 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => [] ] ];
         $this->SI = [];		// sharedStrings index
         $this->SI_KEYS = []; //  & keys
         $this->XF  = [  // styles
@@ -156,7 +156,7 @@ class SimpleXLSXGen {
             }
         }
 
-        $this->sheets[$this->curSheet] = ['name' => $name, 'hyperlinks' => [], 'mergecells' => []];
+        $this->sheets[$this->curSheet] = ['name' => $name, 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => []];
 
         if ( isset( $rows[0] ) && is_array($rows[0]) ) {
             $this->sheets[$this->curSheet]['rows'] = $rows;
@@ -601,7 +601,7 @@ class SimpleXLSXGen {
                                 $cv = $this->date2excel( $m[3], $m[2], $m[1], $m[4], $m[5], $m[6] );
                                 $N = self::N_DATETIME; // [22] m/d/yy h:mm
                             } elseif ( preg_match( '/^[0-9+-.]+$/', $v ) ) { // Long ?
-                                $A += self::A_RIGHT;
+                                $A += ($A & (self::A_LEFT | self::A_CENTER)) ? 0 : self::A_RIGHT;
                             } elseif ( preg_match( '/^https?:\/\/\S+$/i', $v ) ) {
                                 $h = explode( '#', $v );
                                 $this->sheets[ $idx ]['hyperlinks'][] = ['ID' => 'rId' . ( count( $this->sheets[ $idx ]['hyperlinks'] ) + 1 ), 'R' => $cname, 'H' => $h[0], 'L' => isset( $h[1] ) ? $h[1] : ''];
@@ -682,7 +682,8 @@ class SimpleXLSXGen {
                 $ROWS[] = '<row r="'.$CUR_ROW.'"'.($RH ? ' customHeight="1" ht="'.$RH.'"' : '').'>'.$row . "</row>";
             }
             foreach ( $COL as $k => $max ) {
-                $COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.min( $max+1, 60).'" />';
+                $w = isset($this->sheets[$idx]['colwidth'][$k]) ? $this->sheets[$idx]['colwidth'][$k] : min( $max+1, 60);
+                $COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.$w.'" />';
             }
             $COLS[] = '</cols>';
             $REF = 'A1:'.$this->num2name(count($COL)) . $CUR_ROW;
@@ -764,6 +765,10 @@ class SimpleXLSXGen {
     }
     public function mergeCells( $range ) {
         $this->sheets[$this->curSheet]['mergecells'][] = $range;
+        return $this;
+    }
+    public function setColWidth($col, $width) {
+        $this->sheets[$this->curSheet]['colwidth'][$col] = $width;
         return $this;
     }
     public function esc( $str ) {

@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.2.13 (2022-06-01)
+* setColWidth(num_col_started_1, size_in_chars) - set column width
+
 ## 1.2.12 (2022-05-17)
 * Vertical align (tags top,middle,bottom) `<bottom>12345</bottom>`
 
