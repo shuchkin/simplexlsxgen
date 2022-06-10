@@ -1,4 +1,6 @@
 # Changelog
+## 1.2.14 (2022-06-10)
+* added example [JS array to Excel (AJAX)](https://github.com/shuchkin/simplexlsxgen#js-array-to-excel-ajax)
 
 ## 1.2.13 (2022-06-01)
 * setColWidth(num_col_started_1, size_in_chars) - set column width
