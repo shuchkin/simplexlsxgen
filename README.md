@@ -79,7 +79,7 @@ $data = [
 SimpleXLSXGen::fromArray( $data )
     ->setDefaultFont( 'Courier New' )
     ->setDefaultFontSize( 14 )
-    ->setColWidth(1, 35)
+    ->setColWidth(1, 35) // 1 - num column, 35 - size in chars
     ->mergeCells('A20:B20')
     ->saveAs('styles_and_tags.xlsx');
 ```
@@ -103,6 +103,54 @@ $xlsx->addSheet( $books, 'Catalog 2021' );
 $xlsx->addSheet( $books2, 'Stephen King catalog');
 $xlsx->downloadAs('books_2021.xlsx');
 exit();
+```
+### JS array to Excel (AJAX)
+```php
+<?php // array2excel.php
+if (isset($_POST['array2excel'])) {
+    require __DIR__.'/simplexlsxgen/src/SimpleXLSXGen.php';
+    $data = json_decode($_POST['array2excel'], false);
+    \Shuchkin\SimpleXLSXGen::fromArray($data)->downloadAs('file.xlsx');
+    return;
+}
+?>
+<html lang="en">
+<head>
+    <title>JS array to Excel</title>
+</head>
+<script>
+
+function array2excel() {
+    var books = [
+        ["ISBN", "title", "author", "publisher", "ctry"],
+        [618260307, "The Hobbit", "J. R. R. Tolkien", "Houghton Mifflin", "USA"],
+        [908606664, "Slinky Malinki", "Lynley Dodd", "Mallinson Rendel", "NZ"]
+    ];
+    var json = JSON.stringify(books);
+
+    var request = new XMLHttpRequest();
+
+    request.onreadystatechange = function () {
+        if (this.readyState === 4) {
+            if (this.status === 200) {
+                var file = new Blob([this.response], {type:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+                var fileURL = URL.createObjectURL(file);
+                window.open(fileURL);
+            } else {
+                alert("Error: " + this.status + "  " + this.statusText);
+            }
+        }
+    }
+    request.open('POST', "array2excel.php");
+    request.responseType = "blob";
+    request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    request.send("array2excel=" + encodeURIComponent(json));
+}
+</script>
+<body>
+<input type="button" onclick="array2excel()" value="array2excel" />
+</body>
+</html>
 ```
 
 ## Debug
