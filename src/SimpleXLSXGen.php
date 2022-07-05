@@ -50,6 +50,7 @@ class SimpleXLSXGen {
     const A_TOP = 8;
     const A_MIDDLE = 16;
     const A_BOTTOM = 32;
+    const A_WRAPTEXT = 64;
 
     public function __construct() {
         $this->curSheet = -1;
@@ -354,7 +355,8 @@ class SimpleXLSXGen {
                         .($xf[1] & self::A_CENTER ? ' horizontal="center"' : '')
                         .($xf[1] & self::A_TOP ? ' vertical="top"' : '')
                         .($xf[1] & self::A_MIDDLE ? ' vertical="center"' : '')
-                        .($xf[1] & self::A_BOTTOM ? ' vertical="bottom"' : '');
+                        .($xf[1] & self::A_BOTTOM ? ' vertical="bottom"' : '')
+                        .($xf[1] & self::A_WRAPTEXT ? ' wrapText="1"' : '');
 
                     $XF[] = '<xf numFmtId="'.$xf[0].'" fontId="'.$F_ID.'" fillId="'.$FL_ID.'" borderId="0" xfId="0"'
                         .($xf[0] > 0 ? ' applyNumberFormat="1"' : '')
@@ -556,6 +558,9 @@ class SimpleXLSXGen {
                                 }
                                 if ( strpos( $v, '<bottom>' ) !== false ) {
                                     $A += self::A_BOTTOM;
+                                }
+                                if ( strpos( $v, '<wraptext>' ) !== false ) {
+                                    $A += self::A_WRAPTEXT;
                                 }
                                 if ( preg_match( '/<a href="(https?:\/\/[^"]+)">(.*?)<\/a>/i', $v, $m ) ) {
                                     $h = explode( '#', $m[1] );

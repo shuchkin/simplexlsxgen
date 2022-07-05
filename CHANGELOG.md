@@ -1,4 +1,7 @@
 # Changelog
+## 1.2.15 (2022-07-05)
+* added wrap words in long strings `&lt;wraptext&gt;long long line&lt;/wraptext&gt;`
+
 ## 1.2.14 (2022-06-10)
 * added example [JS array to Excel (AJAX)](https://github.com/shuchkin/simplexlsxgen#js-array-to-excel-ajax)
 
