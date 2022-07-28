@@ -131,17 +131,29 @@ function array2excel() {
 
     var request = new XMLHttpRequest();
 
-    request.onreadystatechange = function () {
-        if (this.readyState === 4) {
-            if (this.status === 200) {
-                var file = new Blob([this.response], {type:  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-                var fileURL = URL.createObjectURL(file);
-                window.open(fileURL);
-            } else {
-                alert("Error: " + this.status + "  " + this.statusText);
+    request.onload = function () {
+        if (this.status === 200) {
+            var file = new Blob([this.response], {type: this.getResponseHeader('Content-Type')});
+            var fileURL = URL.createObjectURL(file);
+            var filename = "", m;
+            var disposition = this.getResponseHeader('Content-Disposition');
+            if (disposition && (m = /"([^"]+)"/.exec(disposition)) !== null) {
+                filename = m[1];
             }
+            var a = document.createElement("a");
+            if (typeof a.download === 'undefined') {
+                window.location = fileURL;
+            } else {
+                a.href = fileURL;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+            }
+        } else {
+            alert("Error: " + this.status + "  " + this.statusText);
         }
     }
+    
     request.open('POST', "array2excel.php");
     request.responseType = "blob";
     request.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
