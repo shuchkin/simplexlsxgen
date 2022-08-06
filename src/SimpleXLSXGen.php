@@ -768,6 +768,11 @@ class SimpleXLSXGen {
         $this->defaultFontSize = $size;
         return $this;
     }
+    public function modTemplate( $path, $custom_xml ) {
+        $t = $this->template[ $path ];
+        $p = strrpos($t,'</');
+        return $this->template[ $path ] = substr($t, 0, $p) . $custom_xml . substr($t,$p);
+    }
     public function mergeCells( $range ) {
         $this->sheets[$this->curSheet]['mergecells'][] = $range;
         return $this;

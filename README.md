@@ -104,6 +104,10 @@ $xlsx->addSheet( $books, 'Catalog 2021' );
 $xlsx->addSheet( $books2, 'Stephen King catalog');
 $xlsx->downloadAs('books_2021.xlsx');
 exit();
+
+// Customize XML
+$xlsx->modTemplate('xl/worksheets/sheet1.xml', '<autoFilter ref="A1:A5"/>');
+
 ```
 ### JS array to Excel (AJAX)
 ```php

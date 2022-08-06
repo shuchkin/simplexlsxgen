@@ -1,4 +1,10 @@
 # Changelog
+## 1.2.16 (2022-08-06)
+* added modTemplate( $path, $custom_xml ) for customize generated XML
+```php
+$xlsx->modTemplate('xl/worksheets/sheet1.xml', '<autoFilter ref="A1:A5"/>');
+```
+
 ## 1.2.15 (2022-07-05)
 * added wrap words in long strings `<wraptext>long long line</wraptext>`
 
