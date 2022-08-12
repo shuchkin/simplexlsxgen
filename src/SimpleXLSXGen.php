@@ -55,7 +55,7 @@ class SimpleXLSXGen {
     public function __construct() {
         $this->curSheet = -1;
         $this->defaultFont = 'Calibri';
-        $this->sheets = [ ['name' => 'Sheet1', 'rows' => [], 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => [] ] ];
+        $this->sheets = [ ['name' => 'Sheet1', 'rows' => [], 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => [], 'autofilter' => '' ] ];
         $this->SI = [];		// sharedStrings index
         $this->SI_KEYS = []; //  & keys
         $this->XF  = [  // styles
@@ -90,7 +90,7 @@ class SimpleXLSXGen {
             'xl/worksheets/sheet1.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"
     xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"
-><dimension ref="{REF}"/>{COLS}<sheetData>{ROWS}</sheetData>{MERGECELLS}{HYPERLINKS}</worksheet>',
+><dimension ref="{REF}"/>{COLS}<sheetData>{ROWS}</sheetData>{AUTOFILTER}{MERGECELLS}{HYPERLINKS}</worksheet>',
             'xl/worksheets/_rels/sheet1.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{HYPERLINKS}</Relationships>',
             'xl/sharedStrings.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -157,7 +157,7 @@ class SimpleXLSXGen {
             }
         }
 
-        $this->sheets[$this->curSheet] = ['name' => $name, 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => []];
+        $this->sheets[$this->curSheet] = ['name' => $name, 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => [], 'autofilter' => '' ];
 
         if ( isset( $rows[0] ) && is_array($rows[0]) ) {
             $this->sheets[$this->curSheet]['rows'] = $rows;
@@ -620,7 +620,7 @@ class SimpleXLSXGen {
                                 $N = 0;
                             }
                         }
-                        if ( !$cv) {
+                        if ( $cv === null ) {
 
                             $v = $this->esc( $v );
 
@@ -697,6 +697,11 @@ class SimpleXLSXGen {
             $REF = 'A1:A1';
         }
 
+        $AUTOFILTER = '';
+        if ($this->sheets[$idx]['autofilter']) {
+            $AUTOFILTER = '<autoFilter ref="'.$this->sheets[$idx]['autofilter'].'" />';
+        }
+
         $MERGECELLS = [];
         if ( count($this->sheets[$idx]['mergecells']) ) {
             $MERGECELLS[] = '';
@@ -715,11 +720,18 @@ class SimpleXLSXGen {
             }
             $HYPERLINKS[] = '</hyperlinks>';
         }
+
         //restore locale
         setlocale(LC_NUMERIC, $_loc);
 
-        return str_replace(['{REF}','{COLS}','{ROWS}','{MERGECELLS}','{HYPERLINKS}'],
-            [ $REF, implode("\r\n", $COLS), implode("\r\n",$ROWS), implode("\r\n", $MERGECELLS), implode("\r\n", $HYPERLINKS) ],
+        return str_replace(['{REF}','{COLS}','{ROWS}','{AUTOFILTER}','{MERGECELLS}','{HYPERLINKS}'],
+            [ $REF,
+                implode("\r\n", $COLS),
+                implode("\r\n",$ROWS),
+                $AUTOFILTER,
+                implode("\r\n", $MERGECELLS),
+                implode("\r\n", $HYPERLINKS)
+            ],
             $template );
     }
 
@@ -768,11 +780,12 @@ class SimpleXLSXGen {
         $this->defaultFontSize = $size;
         return $this;
     }
-    public function modTemplate( $path, $custom_xml ) {
-        $t = $this->template[ $path ];
-        $p = strrpos($t,'</');
-        return $this->template[ $path ] = substr($t, 0, $p) . $custom_xml . substr($t,$p);
+
+    public function autoFilter( $range ) {
+        $this->sheets[$this->curSheet]['autofilter'] = $range;
+        return $this;
     }
+
     public function mergeCells( $range ) {
         $this->sheets[$this->curSheet]['mergecells'][] = $range;
         return $this;

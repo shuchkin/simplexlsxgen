@@ -1,9 +1,10 @@
 # Changelog
-## 1.2.16 (2022-08-06)
-* added modTemplate( $path, $custom_xml ) for customize generated XML
+## 1.2.16 (2022-08-12)
+* added `autoFilter( $range )`
 ```php
-$xlsx->modTemplate('xl/worksheets/sheet1.xml', '<autoFilter ref="A1:A5"/>');
+$xlsx->autoFilter('A2:B10');
 ```
+* fixed `0%` bug 
 
 ## 1.2.15 (2022-07-05)
 * added wrap words in long strings `<wraptext>long long line</wraptext>`
