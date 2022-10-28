@@ -688,7 +688,7 @@ class SimpleXLSXGen {
             }
             foreach ( $COL as $k => $max ) {
                 $w = isset($this->sheets[$idx]['colwidth'][$k]) ? $this->sheets[$idx]['colwidth'][$k] : min( $max+1, 60);
-                $COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.$w.'" />';
+                $COLS[] = '<col min="'.$k.'" max="'.$k.'" width="'.$w.'" customWidth="1" />';
             }
             $COLS[] = '</cols>';
             $REF = 'A1:'.$this->num2name(count($COL)) . $CUR_ROW;
