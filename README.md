@@ -39,16 +39,22 @@ $data = [
     ['Integer', 123],
     ['Float', 12.35],
     ['Percent', '12%'],
+    ['Currency $', '$500.67'],
+    ['Currency €', '200 €'],
+    ['Currency ₽', '1200.30 ₽'],
+    ['Currency (other)', '<style nf="&quot;£&quot;#,##0.00">500</style>'],
     ['Datetime', '2020-05-20 02:38:00'],
-    ['Date','2020-05-20'],
-    ['Time','02:38:00'],
+    ['Date', '2020-05-20'],
+    ['Time', '02:38:00'],
     ['Datetime PHP', new DateTime('2021-02-06 21:07:00')],
     ['String', 'Long UTF-8 String in autoresized column'],
+    ['Formula', '<f v="135.35">SUM(B1:B2)</f>'],
     ['Hyperlink', 'https://github.com/shuchkin/simplexlsxgen'],
     ['Hyperlink + Anchor', '<a href="https://github.com/shuchkin/simplexlsxgen">SimpleXLSXGen</a>'],
-    ['RAW string', "\0".'2020-10-04 16:02:00']
+    ['Internal link', '<a href="sheet2!A1">Go to second page</a>'],
+    ['RAW string', "\0" . '2020-10-04 16:02:00']
 ];
-Shuchkin\SimpleXLSXGen::fromArray( $data )->saveAs('datatypes.xlsx');
+SimpleXLSXGen::fromArray($data)->saveAs('datatypes.xlsx');
 ```
 ![XLSX screenshot](datatypes.png)
 
@@ -66,6 +72,9 @@ $data = [
     ['Green', '<style color="#00FF00">12345.67</style>'],
     ['Bold Red Text', '<b><style color="#FF0000">12345.67</style></b>'],
     ['Blue Text and Yellow Fill', '<style bgcolor="#FFFF00" color="#0000FF">12345.67</style>'],
+    ['Border color', '<style border="#000000">Black Thin Border</style>'],
+    ['<top>Border style</top>','<style border="medium"><wraptext>none, thin, medium, dashed, dotted, thick, double, hair, mediumDashed, dashDot,mediumDashDot, dashDotDot, mediumDashDotDot, slantDashDot</wraptext></style>'],
+    ['Border sides', '<style border="none dotted#0000FF medium#FF0000 double">Top No + Right Dotted + Bottom medium + Left double</style>'],
     ['Left', '<left>12345.67</left>'],
     ['Center', '<center>12345.67</center>'],
     ['Right', '<right>Right Text</right>'],
@@ -77,10 +86,10 @@ $data = [
     ['<center>MERGE CELLS MERGE CELLS MERGE CELLS MERGE CELLS MERGE CELLS</center>', null],
     ['<top>Word wrap</top>', "<wraptext>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book</wraptext>"]
 ];
-SimpleXLSXGen::fromArray( $data )
-    ->setDefaultFont( 'Courier New' )
-    ->setDefaultFontSize( 14 )
-    ->setColWidth(1, 35) // 1 - num column, 35 - size in chars
+SimpleXLSXGen::fromArray($data)
+    ->setDefaultFont('Courier New')
+    ->setDefaultFontSize(14)
+    ->setColWidth(1, 35)
     ->mergeCells('A20:B20')
     ->saveAs('styles_and_tags.xlsx');
 ```

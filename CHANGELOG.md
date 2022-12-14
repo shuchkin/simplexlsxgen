@@ -1,4 +1,12 @@
 # Changelog
+
+## 1.3.10 (2022-12-14)
+* added borders ```<style border="medium">Black Border</style>``` see colored [examples](https://github.com/shuchkin/simplexlsxgen#formatting)
+* added formulas ```<f v="100">SUM(B1:B10)</f>``` see [examples](https://github.com/shuchkin/simplexlsxgen#data-types)
+* added internal links ```<a href="sheet2!A1">Go to page 2</a>```
+* added custom number formats ```<style nf="&quot;£&quot;#,##0.00">500</style>```
+* added 3 currencies ```$data = [ ['$100.23', '2000.00 €', '1200.30 ₽'] ];```
+
 ## 1.2.16 (2022-08-12)
 * added `autoFilter( $range )`
 ```php
