@@ -747,15 +747,16 @@ class SimpleXLSXGen
                                 if (strlen($m[2]) < 3) {
                                     $N = self::N_DEC;
                                 }
-                            } elseif (preg_match('/^(\$)?[-+]?[0-9\.]+( ₽| €)?$/u', $v, $m)) { // currency?
-                                if ($m[1] === '$') {
-                                    $N = self::N_DOLLAR;
-                                } elseif ($m[2] === ' ₽') {
+                            } elseif (preg_match('/^\$[-+]?[0-9\.]+$/', $v)) { // currency $?
+                                $N = self::N_DOLLAR;
+                                $cv = ltrim($v, '+$');
+                            } elseif (preg_match('/^[-+]?[0-9\.]+( ₽| €)$/u', $v, $m)) { // currency ₽ €?
+                                if ($m[1] === ' ₽') {
                                     $N = self::N_RUB;
-                                } elseif ($m[2] === ' €') {
+                                } elseif ($m[1] === ' €') {
                                     $N = self::N_EURO;
                                 }
-                                $cv = trim($v, ' +$₽€');
+                                $cv = trim($v, ' +₽€');
                             } elseif (preg_match('/^([-+]?\d+)%$/', $v, $m)) {
                                 $cv = round($m[1] / 100, 2);
                                 $N = self::N_PERCENT_INT; // [9] 0%
