@@ -449,7 +449,7 @@ class SimpleXLSXGen
                             }
                             $sides = [ 'left' => 3, 'right' => 1, 'top' => 0, 'bottom' => 2, 'diagonal' => 4];
                             foreach ($sides as $side => $idx) {
-                                $s = '';
+                                $s = 'thin';
                                 $c = '';
 
                                 $va = explode('#', $ba[$idx]);
@@ -459,7 +459,6 @@ class SimpleXLSXGen
                                 } elseif (in_array($va[0], $this->BR_STYLE, true)) {
                                     $s = $va[0];
                                 } else {
-                                    $s = 'thin';
                                     $c = $va[0];
                                 }
                                 if (strlen($c) === 6) {
