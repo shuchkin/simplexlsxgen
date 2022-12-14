@@ -645,7 +645,7 @@ class SimpleXLSXGen
 
                     if (is_string($v)) {
 
-                        if ($v{0} === "\0") { // RAW value as string
+                        if ($v[0] === "\0") { // RAW value as string
                             $v = substr($v, 1);
                             $vl = mb_strlen($v);
                         } else {
