@@ -95,6 +95,21 @@ SimpleXLSXGen::fromArray($data)
 ```
 ![XLSX screenshot](styles.png)
 
+### RAW Strings
+Prefix #0 cell value (use double quotes).
+```php
+$PushkinDOB = '1799-07-06';
+$data = [
+    ['Datetime as raw string', "\0".'2023-01-09 11:16:34'],
+    ['Date as raw string', "\0".$PushkinDOB],
+    ['Disable type detection', "\0".'+12345'],
+    ['Insert greater/less them simbols', "\0".'20- short term: <6 month'],
+
+];
+SimpleXLSXGen::fromArray($data)
+    ->saveAs('test_rawstrings.xlsx');
+```
+
 ### More examples
 ```php
 // Fluid interface, output to browser for download
