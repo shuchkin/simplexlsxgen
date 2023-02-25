@@ -33,6 +33,7 @@ $ composer require shuchkin/simplexlsxgen
 or download class [here](https://github.com/shuchkin/simplexlsxgen/blob/master/src/SimpleXLSXGen.php)
 
 ## Examples
+Use UTF-8 encoded strings.
 ### Data types
 ```php
 $data = [
@@ -47,7 +48,7 @@ $data = [
     ['Date', '2020-05-20'],
     ['Time', '02:38:00'],
     ['Datetime PHP', new DateTime('2021-02-06 21:07:00')],
-    ['String', 'Long UTF-8 String in autoresized column'],
+    ['String', 'Very long UTF-8 string in autoresized column'],
     ['Formula', '<f v="135.35">SUM(B1:B2)</f>'],
     ['Hyperlink', 'https://github.com/shuchkin/simplexlsxgen'],
     ['Hyperlink + Anchor', '<a href="https://github.com/shuchkin/simplexlsxgen">SimpleXLSXGen</a>'],
