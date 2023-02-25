@@ -1,7 +1,7 @@
 {
   "name": "shuchkin/simplexlsxgen",
   "description": "Export data to Excel XLSx file. PHP XLSX generator.",
-  "keywords": ["php", "excel", "xlsx", "generator", "creator", "backend"],
+  "keywords": ["php", "excel", "xlsx", "generator", "writer", "creator", "backend"],
   "homepage": "https://github.com/shuchkin/simplexlsxgen",
   "license": "MIT",
   "authors": [
