@@ -215,7 +215,7 @@ class SimpleXLSXGen
             }
         }
 
-        $this->sheets[$this->curSheet] = ['name' => $name, 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => [], 'autofilter' => ''];
+        $this->sheets[$this->curSheet] = ['name' => $name, 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => [], 'autofilter' => '', 'frozen' => ''];
 
         if (isset($rows[0]) && is_array($rows[0])) {
             $this->sheets[$this->curSheet]['rows'] = $rows;
@@ -617,7 +617,28 @@ class SimpleXLSXGen
         setlocale(LC_NUMERIC, 'C');
         $COLS = [];
         $ROWS = [];
+        $SHEETVIEWS = '';
         if (count($this->sheets[$idx]['rows'])) {
+            if ($this->sheets[$idx]['frozen'] !== '' || isset($this->sheets[$idx]['frozen'][0]) || isset($this->sheets[$idx]['frozen'][1])) {
+                $x = $y = 0;
+                if (is_string($this->sheets[$idx]['frozen'])) {
+                    $cell = $this->sheets[$idx]['frozen'];
+                    self::cell2coord($cell, $x, $y);
+                } else {
+                    if (isset($this->sheets[$idx]['frozen'][0])) $x = $this->sheets[$idx]['frozen'][0];
+                    if (isset($this->sheets[$idx]['frozen'][1])) $y = $this->sheets[$idx]['frozen'][1];
+                    $cell = self::coord2cell($x, $y);
+                }
+                if ($x > 0 || $y > 0) {
+                    $split = '';
+                    if ($x > 0) $split .= " xSplit=\"{$x}\"";
+                    if ($y > 0) $split .= " ySplit=\"{$y}\"";
+                    $activepane = 'bottomRight';
+                    if ($x >  0 && $y == 0) $activepane = 'topRight';
+                    if ($x == 0 && $y >  0) $activepane = 'bottomLeft';
+                    $SHEETVIEWS = "<sheetViews><sheetView tabSelected=\"1\" workbookViewId=\"0\"><pane{$split} topLeftCell=\"{$cell}\" activePane=\"{$activepane}\" state=\"frozen\"/></sheetView></sheetViews>";
+                }
+            }
             $COLS[] = '<cols>';
             $CUR_ROW = 0;
             $COL = [];
@@ -903,13 +924,15 @@ class SimpleXLSXGen
         //restore locale
         setlocale(LC_NUMERIC, $_loc);
 
-        return str_replace(['{REF}', '{COLS}', '{ROWS}', '{AUTOFILTER}', '{MERGECELLS}', '{HYPERLINKS}'],
-            [$REF,
+        return str_replace(['{REF}', '{COLS}', '{ROWS}', '{AUTOFILTER}', '{MERGECELLS}', '{HYPERLINKS}', '{SHEETVIEWS}'],
+            [
+                $REF,
                 implode("\r\n", $COLS),
                 implode("\r\n", $ROWS),
                 $AUTOFILTER,
                 implode("\r\n", $MERGECELLS),
-                implode("\r\n", $HYPERLINKS)
+                implode("\r\n", $HYPERLINKS),
+                $SHEETVIEWS
             ],
             $template);
     }
@@ -1010,6 +1033,39 @@ class SimpleXLSXGen
     public static function raw($value)
     {
         return "\0" . (string)$value;
+    }
+
+    public static function cell2coord($cell, &$x, &$y)
+    {
+        $x = $y = 0;
+        $lettercount = 0;
+        $cell = str_replace([' ', '\t', '\r', '\n', '\v', '\0'], '', $cell);
+        if (empty($cell)) return;
+        $cell = strtoupper($cell);
+        for ($i = 0; $i < strlen($cell); $i++) if ($cell[$i] >= 'A' && $cell[$i] <= 'Z') $lettercount++;
+        if ($lettercount > 0) {
+            $x = ord($cell[$lettercount - 1]) - ord('A');
+            $e = 1;
+            for ($i = $lettercount - 2 ; $i >= 0 ; $i--) {
+                $x += (ord($cell[$i]) - ord('A') + 1) * (26**$e);
+                $e++;
+            }
+        }
+        if ($lettercount < strlen($cell)) $y = ((int)substr($cell, $lettercount)) - 1;
+    }
+
+    public static function coord2cell($x, $y, $absolute = false)
+    {
+        $c = '';
+        for ($i = $x; $i >= 0; $i = ((int)($i / 26)) - 1) $c = chr(ord('A') + $i % 26) . $c;
+        if ($absolute) $absolute = '$'; else $absolute = '';
+        return $absolute . $c . $absolute . ($y+1);
+    }
+
+    public function setFrozen($cell)
+    {
+        $this->sheets[$this->curSheet]['frozen'] = $cell;
+        return $this;
     }
 
 }
