@@ -1062,7 +1062,7 @@ class SimpleXLSXGen
         return $absolute . $c . $absolute . ($y+1);
     }
 
-    public function setFrozen($cell)
+    public function freezePanes($cell)
     {
         $this->sheets[$this->curSheet]['frozen'] = $cell;
         return $this;
