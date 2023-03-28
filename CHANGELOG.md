@@ -1,7 +1,7 @@
 # Changelog
 
 ## 1.3.11 (2023-03-28)
-* freezePanes( corner_cell ) - freezePanes to keep an area of a worksheet visible while you scroll, corner_cell is not included.
+* freezePanes( corner_cell ) - freezePanes to keep an area of a worksheet visible while you scroll, corner_cell is not included, thx [Javier](https://github.com/xaviermdq)
 
 ## 1.3.10 (2022-12-14)
 * added borders ```<style border="medium">Black Border</style>``` see colored [examples](https://github.com/shuchkin/simplexlsxgen#formatting)
