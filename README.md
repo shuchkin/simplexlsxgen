@@ -133,6 +133,10 @@ exit();
 // Autofilter
 $xlsx->autoFilter('A1:B10');
 
+// Freeze rows and columns from top-left corner up to, but not including,
+// the row and column of the indicated cell
+$xlsx->freezePanes('C3');
+
 ```
 ### JS array to Excel (AJAX)
 ```php
