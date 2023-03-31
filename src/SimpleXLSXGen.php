@@ -80,6 +80,7 @@ class SimpleXLSXGen
     {
         $this->curSheet = -1;
         $this->defaultFont = 'Calibri';
+        $this->defaultFontSize = 10;
         $this->sheets = [['name' => 'Sheet1', 'rows' => [], 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => [], 'autofilter' => '']];
         $this->extLinkId = 0;
         $this->SI = [];        // sharedStrings index
@@ -385,7 +386,7 @@ class SimpleXLSXGen
                 }
 
                 foreach ($this->XF as $xf) {
-                    // 0 - num fmt, 1 - align, 2 - font, 3 - fill, 4 - font color, 5 - bgcolor, 6 - border
+                    // 0 - num fmt, 1 - align, 2 - font, 3 - fill, 4 - font color, 5 - bgcolor, 6 - border, 7 - font size
                     // fonts
                     $F_KEY = $xf[2] . '-' . $xf[4];
                     if (isset($F_KEYS[$F_KEY])) {
@@ -394,7 +395,7 @@ class SimpleXLSXGen
                         $F_ID = $F_KEYS[$F_KEY] = count($FONTS);
 
                         $FONTS[] = '<font><name val="' . $this->defaultFont . '"/><family val="2"/>'
-                            . ($this->defaultFontSize ? '<sz val="' . $this->defaultFontSize . '"/>' : '')
+                            . ($xf[7] ? '<sz val="' . $xf[7] . '"/>' : '<sz val="' . $this->defaultFontSize . '"/>')
                             . ($xf[2] & self::F_BOLD ? '<b/>' : '')
                             . ($xf[2] & self::F_ITALIC ? '<i/>' : '')
                             . ($xf[2] & self::F_UNDERLINE ? '<u/>' : '')
@@ -660,7 +661,7 @@ class SimpleXLSXGen
                     }
 
                     $ct = $cv = $cf = null;
-                    $N = $A = $F = $FL = $C = $BG = 0;
+                    $N = $A = $F = $FL = $C = $BG = $FS = 0;
                     $BR = '';
 
                     if (is_string($v)) {
@@ -707,6 +708,12 @@ class SimpleXLSXGen
                                         if ($b && $b !== 'none') {
                                             $BR = $b;
                                         }
+                                    }
+                                    if (preg_match('/ font-size="([^"]+)"/', $m[1], $m2)) {
+                                        $FS = (int)$m2[1];
+                                        if($RH == 0){
+                                          $RH = (int)($FS * 1.25);
+					}
                                     }
                                 }
                                 if (strpos($v, '<left>') !== false) {
@@ -858,7 +865,7 @@ class SimpleXLSXGen
 
                     $cs = 0;
 
-                    if (($N + $A + $F + $FL > 0) || $BR !== '') {
+                    if (($N + $A + $F + $FL + $FS > 0) || $BR !== '') {
 
                         if ($FL === self::FL_COLOR) {
                             $FL += self::FL_SOLID;
@@ -868,7 +875,7 @@ class SimpleXLSXGen
                             $C = 'FF0563C1';
                         }
 
-                        $XF_KEY = $N . '-' . $A . '-' . $F . '-' . $FL . '-' . $C . '-' . $BG . '-' . $BR;
+                        $XF_KEY = $N . '-' . $A . '-' . $F . '-' . $FL . '-' . $C . '-' . $BG . '-' . $BR . '-' . $FS;
 //                        echo $cname .'='.$XF_KEY.PHP_EOL;
                         if (isset($this->XF_KEYS[$XF_KEY])) {
                             $cs = $this->XF_KEYS[$XF_KEY];
@@ -876,7 +883,7 @@ class SimpleXLSXGen
                         if ($cs === 0) {
                             $cs = count($this->XF);
                             $this->XF_KEYS[$XF_KEY] = $cs;
-                            $this->XF[] = [$N, $A, $F, $FL, $C, $BG, $BR];
+                            $this->XF[] = [$N, $A, $F, $FL, $C, $BG, $BR, $FS];
                         }
                     }
 

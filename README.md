@@ -86,6 +86,7 @@ $data = [
     ['Bottom + Right', '<style height="50"><bottom><right>Bottom + Right</right></bottom></style>'],
     ['<center>MERGE CELLS MERGE CELLS MERGE CELLS MERGE CELLS MERGE CELLS</center>', null],
     ['<top>Word wrap</top>', "<wraptext>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book</wraptext>"]
+    ['Size 16 Font', '<style font-size="16">Big Text</style>'],
 ];
 SimpleXLSXGen::fromArray($data)
     ->setDefaultFont('Courier New')
