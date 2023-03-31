@@ -564,8 +564,6 @@ class SimpleXLSXGen
         $lastmod_dateM = str_pad(decbin(date('m')), 4, '0', STR_PAD_LEFT);
         $lastmod_dateY = str_pad(decbin(date('Y') - 1980), 7, '0', STR_PAD_LEFT);
 
-        # echo "ModTime: $lastmod_timeS-$lastmod_timeM-$lastmod_timeH (".date("s H H").")\n";
-        # echo "ModDate: $lastmod_dateD-$lastmod_dateM-$lastmod_dateY (".date("d m Y").")\n";
         $e['modtime'] = bindec("$lastmod_timeH$lastmod_timeM$lastmod_timeS");
         $e['moddate'] = bindec("$lastmod_dateY$lastmod_dateM$lastmod_dateD");
 
@@ -888,7 +886,6 @@ class SimpleXLSXGen
                         }
 
                         $XF_KEY = $N . '-' . $A . '-' . $F . '-' . $FL . '-' . $C . '-' . $BG . '-' . $BR . '-' . $FS;
-//                        echo $cname .'='.$XF_KEY.PHP_EOL;
                         if (isset($this->XF_KEYS[$XF_KEY])) {
                             $cs = $this->XF_KEYS[$XF_KEY];
                         }
