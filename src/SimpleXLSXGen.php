@@ -112,9 +112,9 @@ class SimpleXLSXGen
         ];
 
 
-        $this->XF = [  // styles 0 - num fmt, 1 - align, 2 - font, 3 - fill, 4 - font color, 5 - bgcolor, 6 - border
-            [self::N_NORMAL, self::A_DEFAULT, self::F_NORMAL, self::FL_NONE, 0, 0, ''],
-            [self::N_NORMAL, self::A_DEFAULT, self::F_NORMAL, self::FL_GRAY_125, 0, 0, ''], // hack
+        $this->XF = [  // styles 0 - num fmt, 1 - align, 2 - font, 3 - fill, 4 - font color, 5 - bgcolor, 6 - border, 7 - font size
+            [self::N_NORMAL, self::A_DEFAULT, self::F_NORMAL, self::FL_NONE, 0, 0, '', 0],
+            [self::N_NORMAL, self::A_DEFAULT, self::F_NORMAL, self::FL_GRAY_125, 0, 0, '', 0], // hack
         ];
         $this->XF_KEYS[implode('-', $this->XF[0])] = 0; // & keys
         $this->XF_KEYS[implode('-', $this->XF[1])] = 1;
@@ -388,7 +388,7 @@ class SimpleXLSXGen
                 foreach ($this->XF as $xf) {
                     // 0 - num fmt, 1 - align, 2 - font, 3 - fill, 4 - font color, 5 - bgcolor, 6 - border, 7 - font size
                     // fonts
-                    $F_KEY = $xf[2] . '-' . $xf[4];
+                    $F_KEY = $xf[2] . '-' . $xf[4].'-'.$xf[7];
                     if (isset($F_KEYS[$F_KEY])) {
                         $F_ID = $F_KEYS[$F_KEY];
                     } else {
@@ -626,18 +626,30 @@ class SimpleXLSXGen
                     $cell = $this->sheets[$idx]['frozen'];
                     self::cell2coord($cell, $x, $y);
                 } else {
-                    if (isset($this->sheets[$idx]['frozen'][0])) $x = $this->sheets[$idx]['frozen'][0];
-                    if (isset($this->sheets[$idx]['frozen'][1])) $y = $this->sheets[$idx]['frozen'][1];
+                    if (isset($this->sheets[$idx]['frozen'][0])) {
+                        $x = $this->sheets[$idx]['frozen'][0];
+                    }
+                    if (isset($this->sheets[$idx]['frozen'][1])) {
+                        $y = $this->sheets[$idx]['frozen'][1];
+                    }
                     $cell = self::coord2cell($x, $y);
                 }
                 if ($x > 0 || $y > 0) {
                     $split = '';
-                    if ($x > 0) $split .= " xSplit=\"{$x}\"";
-                    if ($y > 0) $split .= " ySplit=\"{$y}\"";
+                    if ($x > 0) {
+                        $split .= ' xSplit="'.$x.'"';
+                    }
+                    if ($y > 0) {
+                        $split .= ' ySplit="'.$y.'"';
+                    }
                     $activepane = 'bottomRight';
-                    if ($x >  0 && $y == 0) $activepane = 'topRight';
-                    if ($x == 0 && $y >  0) $activepane = 'bottomLeft';
-                    $SHEETVIEWS = "<sheetViews><sheetView tabSelected=\"1\" workbookViewId=\"0\"><pane{$split} topLeftCell=\"{$cell}\" activePane=\"{$activepane}\" state=\"frozen\"/></sheetView></sheetViews>";
+                    if ($x >  0 && $y === 0) {
+                        $activepane = 'topRight';
+                    }
+                    if ($x === 0 && $y >  0) {
+                        $activepane = 'bottomLeft';
+                    }
+                    $SHEETVIEWS = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane'.$split.' topLeftCell="'.$cell.'" activePane="'.$activepane.'" state="frozen"/></sheetView></sheetViews>';
                 }
             }
             $COLS[] = '<cols>';
@@ -711,9 +723,9 @@ class SimpleXLSXGen
                                     }
                                     if (preg_match('/ font-size="([^"]+)"/', $m[1], $m2)) {
                                         $FS = (int)$m2[1];
-                                        if($RH == 0){
-                                          $RH = (int)($FS * 1.25);
-					}
+                                        if ($RH === 0) { // fix row height
+                                           $RH = ($FS > $this->defaultFontSize) ? round($FS * 1.50,1) : 0;
+					                    }
                                     }
                                 }
                                 if (strpos($v, '<left>') !== false) {
@@ -1039,7 +1051,7 @@ class SimpleXLSXGen
 
     public static function raw($value)
     {
-        return "\0" . (string)$value;
+        return "\0" . $value;
     }
 
     public static function cell2coord($cell, &$x, &$y)
@@ -1047,9 +1059,15 @@ class SimpleXLSXGen
         $x = $y = 0;
         $lettercount = 0;
         $cell = str_replace([' ', '\t', '\r', '\n', '\v', '\0'], '', $cell);
-        if (empty($cell)) return;
+        if (empty($cell)) {
+            return;
+        }
         $cell = strtoupper($cell);
-        for ($i = 0; $i < strlen($cell); $i++) if ($cell[$i] >= 'A' && $cell[$i] <= 'Z') $lettercount++;
+        for ($i = 0, $len = strlen($cell); $i < $len; $i++) {
+            if ($cell[$i] >= 'A' && $cell[$i] <= 'Z') {
+                $lettercount++;
+            }
+        }
         if ($lettercount > 0) {
             $x = ord($cell[$lettercount - 1]) - ord('A');
             $e = 1;
@@ -1058,15 +1076,18 @@ class SimpleXLSXGen
                 $e++;
             }
         }
-        if ($lettercount < strlen($cell)) $y = ((int)substr($cell, $lettercount)) - 1;
+        if ($lettercount < strlen($cell)) {
+            $y = ((int)substr($cell, $lettercount)) - 1;
+        }
     }
 
     public static function coord2cell($x, $y, $absolute = false)
     {
         $c = '';
-        for ($i = $x; $i >= 0; $i = ((int)($i / 26)) - 1) $c = chr(ord('A') + $i % 26) . $c;
-        if ($absolute) $absolute = '$'; else $absolute = '';
-        return $absolute . $c . $absolute . ($y+1);
+        for ($i = $x; $i >= 0; $i = ((int)($i / 26)) - 1) {
+            $c = chr(ord('A') + $i % 26) . $c;
+        }
+        return ($absolute ? '$' : '') . $c . $absolute . ($y+1);
     }
 
     public function freezePanes($cell)

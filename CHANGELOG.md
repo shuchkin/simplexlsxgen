@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.12 (2023-03-31)
+* ```<style font-size="32">Big Text</style>``` - font size in cells, thx [Andrew Robinson](https://github.com/mrjemson) 
+
+
 ## 1.3.11 (2023-03-28)
 * freezePanes( corner_cell ) - freezePanes to keep an area of a worksheet visible while you scroll, corner_cell is not included, thx [Javier](https://github.com/xaviermdq)
 
