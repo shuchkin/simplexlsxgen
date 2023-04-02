@@ -297,7 +297,7 @@ class SimpleXLSXGen
                 $s = '';
                 for ($i = 0; $i < $cnt_sheets; $i++) {
                     $s .= '<Relationship Id="rId' . ($i + 2) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"' .
-                        ' Target="worksheets/sheet' . ($i + 1) . ".xml\"/>\n";
+                        ' Target="worksheets/sheet' . ($i + 1) . ".xml\"/>\r\n";
                 }
                 $s .= '<Relationship Id="rId' . ($i + 2) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>';
                 $template = str_replace('{SHEETS}', $s, $template);
