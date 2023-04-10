@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.13 (2023-04-11)
+* ```$xlsx->rightToLeft()``` - RTL mode. Column A is on the far right, Column B is one column left of Column A, and so on. Also, information in cells is displayed in the Right to Left format. 
+
+
 ## 1.3.12 (2023-03-31)
 * ```<style font-size="32">Big Text</style>``` - font size in cells, thx [Andrew Robinson](https://github.com/mrjemson) 
 

@@ -138,6 +138,10 @@ $xlsx->autoFilter('A1:B10');
 // the row and column of the indicated cell
 $xlsx->freezePanes('C3');
 
+// RTL mode
+// Column A is on the far right, Column B is one column left of Column A, and so on. Also, information in cells is displayed in the Right to Left format.
+$xlsx->rightToLeft();
+
 ```
 ### JS array to Excel (AJAX)
 ```php

@@ -16,6 +16,7 @@ class SimpleXLSXGen
     public $curSheet;
     protected $defaultFont;
     protected $defaultFontSize;
+    protected $rtl;
     protected $sheets;
     protected $template;
     protected $NF; // numFmts
@@ -80,6 +81,7 @@ class SimpleXLSXGen
         $this->curSheet = -1;
         $this->defaultFont = 'Calibri';
         $this->defaultFontSize = 10;
+        $this->rtl = false;
         $this->sheets = [['name' => 'Sheet1', 'rows' => [], 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => [], 'autofilter' => '']];
         $this->extLinkId = 0;
         $this->SI = [];        // sharedStrings index
@@ -583,13 +585,14 @@ class SimpleXLSXGen
         setlocale(LC_NUMERIC, 'C');
         $COLS = [];
         $ROWS = [];
-        $SHEETVIEWS = '';
+        $SHEETVIEWS = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"'.($this->rtl ? ' rightToLeft="1"' : '').'>';
+        $AC = 'A1'; // Active Cell
         if (count($this->sheets[$idx]['rows'])) {
             if ($this->sheets[$idx]['frozen'] !== '' || isset($this->sheets[$idx]['frozen'][0]) || isset($this->sheets[$idx]['frozen'][1])) {
                 $x = $y = 0;
                 if (is_string($this->sheets[$idx]['frozen'])) {
-                    $cell = $this->sheets[$idx]['frozen'];
-                    self::cell2coord($cell, $x, $y);
+                    $AC = $this->sheets[$idx]['frozen'];
+                    self::cell2coord($AC, $x, $y);
                 } else {
                     if (isset($this->sheets[$idx]['frozen'][0])) {
                         $x = $this->sheets[$idx]['frozen'][0];
@@ -597,7 +600,7 @@ class SimpleXLSXGen
                     if (isset($this->sheets[$idx]['frozen'][1])) {
                         $y = $this->sheets[$idx]['frozen'][1];
                     }
-                    $cell = self::coord2cell($x, $y);
+                    $AC = self::coord2cell($x, $y);
                 }
                 if ($x > 0 || $y > 0) {
                     $split = '';
@@ -614,9 +617,11 @@ class SimpleXLSXGen
                     if ($x === 0 && $y > 0) {
                         $activepane = 'bottomLeft';
                     }
-                    $SHEETVIEWS = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"><pane' . $split . ' topLeftCell="' . $cell . '" activePane="' . $activepane . '" state="frozen"/></sheetView></sheetViews>';
+                    $SHEETVIEWS .= '<pane' . $split . ' topLeftCell="' . $AC . '" activePane="' . $activepane . '" state="frozen"/>';
                 }
             }
+            $SHEETVIEWS .= '<selection activeCell="' . $AC . '" sqref="' . $AC . '"/>';
+            $SHEETVIEWS .= '</sheetView></sheetViews>';
             $COLS[] = '<cols>';
             $CUR_ROW = 0;
             $COL = [];
@@ -972,6 +977,10 @@ class SimpleXLSXGen
         $this->sheets[$this->curSheet]['colwidth'][$col] = $width;
         return $this;
     }
+    public function rightToLeft($value = true) {
+        $this->rtl = $value;
+        return $this;
+    }
 
     public function esc($str)
     {
@@ -993,6 +1002,7 @@ class SimpleXLSXGen
         $this->NF_KEYS[$code] = $id;
         return $id;
     }
+
 
     public static function raw($value)
     {
