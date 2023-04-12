@@ -403,13 +403,25 @@ class SimpleXLSXGen
                             . ($xf[3] & self::FL_COLOR ? '><fgColor rgb="' . $xf[5] . '"/><bgColor indexed="64"/></patternFill>' : ' />')
                             . '</fill>';
                     }
-                    $align = ($xf[1] & self::A_LEFT ? ' horizontal="left"' : '')
-                        . ($xf[1] & self::A_RIGHT ? ' horizontal="right"' : '')
-                        . ($xf[1] & self::A_CENTER ? ' horizontal="center"' : '')
-                        . ($xf[1] & self::A_TOP ? ' vertical="top"' : '')
-                        . ($xf[1] & self::A_MIDDLE ? ' vertical="center"' : '')
-                        . ($xf[1] & self::A_BOTTOM ? ' vertical="bottom"' : '')
-                        . ($xf[1] & self::A_WRAPTEXT ? ' wrapText="1"' : '');
+                    $align = '';
+                    if ($xf[1] & self::A_LEFT) {
+                        $align .= ' horizontal="left"';
+                    } elseif ($xf[1] & self::A_RIGHT) {
+                        $align .= ' horizontal="right"';
+                    } elseif ($xf[1] & self::A_CENTER) {
+                        $align .= ' horizontal="center"';
+                    }
+                    if ($xf[1] & self::A_TOP) {
+                        $align .= ' vertical="top"';
+                    } elseif ($xf[1] & self::A_MIDDLE) {
+                        $align .= ' vertical="center"';
+                    } elseif ($xf[1] & self::A_BOTTOM) {
+                        $align .= ' vertical="bottom"';
+                    }
+                    if ($xf[1] & self::A_WRAPTEXT) {
+                        $align .= ' wrapText="1"';
+                    }
+
                     // border
                     $BR_ID = 0;
                     if ($xf[6] !== '') {
