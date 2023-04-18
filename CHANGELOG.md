@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.14 (2023-04-18)
+* fixed &quot;This action doesn't work on multiple selection&quot; error
+
 ## 1.3.13 (2023-04-11)
 * ```$xlsx->rightToLeft()``` - RTL mode. Column A is on the far right, Column B is one column left of Column A, and so on. Also, information in cells is displayed in the Right to Left format. 
 

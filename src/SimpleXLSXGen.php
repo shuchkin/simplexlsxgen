@@ -140,8 +140,8 @@ class SimpleXLSXGen
 </cp:coreProperties>',
             'xl/_rels/workbook.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>
-{SHEETS}',
+{RELS}
+</Relationships>',
             'xl/worksheets/sheet1.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 <dimension ref="{REF}"/>
@@ -298,17 +298,19 @@ class SimpleXLSXGen
             if ($cfilename === 'xl/_rels/workbook.xml.rels') {
                 $s = '';
                 for ($i = 0; $i < $cnt_sheets; $i++) {
-                    $s .= '<Relationship Id="rId' . ($i + 2) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"' .
+                    $s .= '<Relationship Id="rId' . ($i + 1) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"' .
                         ' Target="worksheets/sheet' . ($i + 1) . ".xml\"/>\r\n";
                 }
-                $s .= '<Relationship Id="rId' . ($i + 2) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/></Relationships>';
-                $template = str_replace('{SHEETS}', $s, $template);
+                $s .= '<Relationship Id="rId' . ($i + 1) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'."\r\n";
+                $s .= '<Relationship Id="rId' . ($i + 2) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>';
+
+                $template = str_replace('{RELS}', $s, $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
             } elseif ($cfilename === 'xl/workbook.xml') {
                 $s = '';
                 foreach ($this->sheets as $k => $v) {
-                    $s .= '<sheet name="' . $this->esc($v['name']) . '" sheetId="' . ($k + 1) . '" state="visible" r:id="rId' . ($k + 2) . '"/>';
+                    $s .= '<sheet name="' . $this->esc($v['name']) . '" sheetId="' . ($k + 1) . '" r:id="rId' . ($k + 1) . '"/>';
                 }
                 $template = str_replace('{SHEETS}', $s, $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
@@ -597,10 +599,12 @@ class SimpleXLSXGen
         setlocale(LC_NUMERIC, 'C');
         $COLS = [];
         $ROWS = [];
-        $SHEETVIEWS = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"'.($this->rtl ? ' rightToLeft="1"' : '').'>';
-        $AC = 'A1'; // Active Cell
+//        $SHEETVIEWS = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"'.($this->rtl ? ' rightToLeft="1"' : '').'>';
+        $SHEETVIEWS = '';
+        $PANE = '';
         if (count($this->sheets[$idx]['rows'])) {
             if ($this->sheets[$idx]['frozen'] !== '' || isset($this->sheets[$idx]['frozen'][0]) || isset($this->sheets[$idx]['frozen'][1])) {
+//                $AC = 'A1'; // Active Cell
                 $x = $y = 0;
                 if (is_string($this->sheets[$idx]['frozen'])) {
                     $AC = $this->sheets[$idx]['frozen'];
@@ -629,11 +633,16 @@ class SimpleXLSXGen
                     if ($x === 0 && $y > 0) {
                         $activepane = 'bottomLeft';
                     }
-                    $SHEETVIEWS .= '<pane' . $split . ' topLeftCell="' . $AC . '" activePane="' . $activepane . '" state="frozen"/>';
+                    $PANE .= '<pane' . $split . ' topLeftCell="' . $AC . '" activePane="' . $activepane . '" state="frozen"/>';
+                    $PANE .= '<selection activeCell="' . $AC . '" sqref="' . $AC . '"/>';
                 }
             }
-            $SHEETVIEWS .= '<selection activeCell="' . $AC . '" sqref="' . $AC . '"/>';
-            $SHEETVIEWS .= '</sheetView></sheetViews>';
+            if ($this->rtl || $PANE) {
+                $SHEETVIEWS .= '<sheetViews>
+<sheetView workbookViewId="0"' . ($this->rtl ? ' rightToLeft="1"' : '');
+                $SHEETVIEWS .= $PANE ? ">\r\n" . $PANE . "\r\n</sheetView>" : ' />';
+                $SHEETVIEWS .= "\r\n</sheetViews>";
+            }
             $COLS[] = '<cols>';
             $CUR_ROW = 0;
             $COL = [];
