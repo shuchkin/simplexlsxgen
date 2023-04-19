@@ -44,6 +44,7 @@ $data = [
     ['Currency €', '200 €'],
     ['Currency ₽', '1200.30 ₽'],
     ['Currency (other)', '<style nf="&quot;£&quot;#,##0.00">500</style>'],
+    ['Currency Float (other)', '<style nf="#,##0.00\ [$£-1];[Red]#,##0.00\ [$£-1]">500.250</style>'],
     ['Datetime', '2020-05-20 02:38:00'],
     ['Date', '2020-05-20'],
     ['Time', '02:38:00'],
