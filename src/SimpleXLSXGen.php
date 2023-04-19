@@ -39,6 +39,7 @@ class SimpleXLSXGen
     protected $application;
     protected $keywords;
     protected $category;
+    protected $lastModifiedBy;
     const N_NORMAL = 0; // General
     const N_INT = 1; // 0
     const N_DEC = 2; // 0.00
@@ -92,12 +93,13 @@ class SimpleXLSXGen
     {
         $this->subject = '';
         $this->title = '';
-        $this->author = 'Sergey Shuchkin';
-        $this->company = 'Sergey Shuchkin';
-        $this->manager = 'Sergey Shuchkin';
+        $this->author = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
+        $this->company = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
+        $this->manager = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
         $this->description = '';
         $this->keywords = '';
         $this->category = '';
+        $this->lastModifiedBy = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
         $this->application = __CLASS__;
 
         $this->curSheet = -1;
@@ -160,6 +162,7 @@ class SimpleXLSXGen
     <dc:title>{TITLE}</dc:title>
     <dc:subject>{SUBJECT}</dc:subject>
     <dc:creator>{AUTHOR}</dc:creator>
+    <cp:lastModifiedBy>{LAST_MODIFY_BY}</cp:lastModifiedBy>
     <cp:keywords>{KEYWORD}</cp:keywords>
     <dc:description>{DESCRIPTION}</dc:description>
     <cp:category>{CATEGORY}</cp:category>
@@ -342,19 +345,19 @@ class SimpleXLSXGen
                     $s .= '<sheet name="' . $this->esc($v['name']) . '" sheetId="' . ($k + 1) . '" r:id="rId' . ($k + 1) . '"/>';
                 }
                 $search = ['{SHEETS}', '{APP}'];
-                $replace = [$s, $this->application];
+                $replace = [$s, $this->esc($this->application)];
                 $template = str_replace($search, $replace, $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
             } elseif ($cfilename === 'docProps/app.xml') {
                 $search = ['{APP}', '{COMPANY}', '{MANAGER}'];
-                $replace = [$this->application, $this->company, $this->manager];
+                $replace = [$this->esc($this->application), $this->esc($this->company), $this->esc($this->manager)];
                 $template = str_replace($search, $replace, $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
             } elseif ($cfilename === 'docProps/core.xml') {
-                $search = ['{DATE}', '{AUTHOR}', '{TITLE}', '{SUBJECT}', '{KEYWORD}', '{DESCRIPTION}', '{CATEGORY}'];
-                $replace = [gmdate('Y-m-d\TH:i:s\Z'), $this->author, $this->title, $this->subject, $this->keywords, $this->description, $this->category];
+                $search = ['{DATE}', '{AUTHOR}', '{TITLE}', '{SUBJECT}', '{KEYWORD}', '{DESCRIPTION}', '{CATEGORY}', '{LAST_MODIFY_BY}'];
+                $replace = [gmdate('Y-m-d\TH:i:s\Z'), $this->esc($this->author), $this->esc($this->title), $this->esc($this->subject), $this->esc($this->keywords), $this->esc($this->description), $this->esc($this->category), $this->esc($this->lastModifiedBy)];
                 $template = str_replace($search, $replace, $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
@@ -1067,6 +1070,11 @@ class SimpleXLSXGen
     public function setApplication($application)
     {
         $this->application = $application;
+        return $this;
+    }
+    public function setLastModifiedBy($lastModifiedBy)
+    {
+        $this->lastModifiedBy = $lastModifiedBy;
         return $this;
     }
 
