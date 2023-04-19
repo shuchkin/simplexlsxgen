@@ -40,6 +40,8 @@ class SimpleXLSXGen
     protected $keywords;
     protected $category;
     protected $lastModifiedBy;
+    protected bool $prtoectedWorkbook;
+    protected array $prtoectedSheet;
     const N_NORMAL = 0; // General
     const N_INT = 1; // 0
     const N_DEC = 2; // 0.00
@@ -101,6 +103,9 @@ class SimpleXLSXGen
         $this->category = '';
         $this->lastModifiedBy = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
         $this->application = __CLASS__;
+
+        $this->prtoectedWorkbook = false;
+        $this->prtoectedSheet = [];
 
         $this->curSheet = -1;
         $this->defaultFont = 'Calibri';
@@ -180,7 +185,7 @@ class SimpleXLSXGen
 {SHEETVIEWS}
 {COLS}
 <sheetData>{ROWS}</sheetData>
-{AUTOFILTER}{MERGECELLS}{HYPERLINKS}
+{PROTECTED_SHEET}{AUTOFILTER}{MERGECELLS}{HYPERLINKS}
 </worksheet>',
             'xl/worksheets/_rels/sheet1.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{HYPERLINKS}</Relationships>',
@@ -199,6 +204,7 @@ class SimpleXLSXGen
             'xl/workbook.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
 <fileVersion appName="{APP}"/>
+{PROTECTED_WORKBOOK}
 <sheets>
 {SHEETS}
 </sheets>
@@ -340,12 +346,16 @@ class SimpleXLSXGen
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
             } elseif ($cfilename === 'xl/workbook.xml') {
+                $prtoectedWorkbook = '<workbookProtection lockStructure="1"/>';
+                if ($this->prtoectedWorkbook == false) {
+                    $prtoectedWorkbook = '';
+                }
                 $s = '';
                 foreach ($this->sheets as $k => $v) {
                     $s .= '<sheet name="' . $this->esc($v['name']) . '" sheetId="' . ($k + 1) . '" r:id="rId' . ($k + 1) . '"/>';
                 }
-                $search = ['{SHEETS}', '{APP}'];
-                $replace = [$s, $this->esc($this->application)];
+                $search = ['{SHEETS}', '{APP}', '{PROTECTED_WORKBOOK}'];
+                $replace = [$s, $this->esc($this->application), $prtoectedWorkbook];
                 $template = str_replace($search, $replace, $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
@@ -935,6 +945,15 @@ class SimpleXLSXGen
             $REF = 'A1:A1';
         }
 
+        $protectedSheet = '';
+        if (is_array($this->prtoectedSheet) and count($this->prtoectedSheet) > 0) {
+            $premissions = 'sheet="1" ';
+            foreach ($this->prtoectedSheet as $namePremissions => $valuePremissions) {
+                $premissions .= $namePremissions . '="' . (int)$valuePremissions . '" ';
+            }
+            $protectedSheet = '<sheetProtection ' . $premissions . '/>';
+        }
+
         $AUTOFILTER = '';
         if ($this->sheets[$idx]['autofilter']) {
             $AUTOFILTER = '<autoFilter ref="' . $this->sheets[$idx]['autofilter'] . '" />';
@@ -961,9 +980,8 @@ class SimpleXLSXGen
 
         //restore locale
         setlocale(LC_NUMERIC, $_loc);
-
         return str_replace(
-            ['{REF}', '{COLS}', '{ROWS}', '{AUTOFILTER}', '{MERGECELLS}', '{HYPERLINKS}', '{SHEETVIEWS}'],
+            ['{REF}', '{COLS}', '{ROWS}', '{AUTOFILTER}', '{MERGECELLS}', '{HYPERLINKS}', '{SHEETVIEWS}', '{PROTECTED_SHEET}'],
             [
                 $REF,
                 implode("\r\n", $COLS),
@@ -971,7 +989,8 @@ class SimpleXLSXGen
                 $AUTOFILTER,
                 implode("\r\n", $MERGECELLS),
                 implode("\r\n", $HYPERLINKS),
-                $SHEETVIEWS
+                $SHEETVIEWS,
+                $protectedSheet
             ],
             $template
         );
@@ -1078,9 +1097,15 @@ class SimpleXLSXGen
         return $this;
     }
 
-    public function setLastModifiedBy($lastModifiedBy)
+    public function setProtectedWorkBook()
     {
-        $this->lastModifiedBy = $lastModifiedBy;
+        $this->prtoectedWorkbook = true;
+        return $this;
+    }
+
+    public function setProtectedSheet(array $prtoectedSheet)
+    {
+        $this->prtoectedSheet = $prtoectedSheet;
         return $this;
     }
 

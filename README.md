@@ -154,6 +154,27 @@ $xlsx->setAuthor('Sergey Shuchkin <sergey.shuchkin@gmail.com>')
     ->setDescription('This is Description')
     ->setCategory('This is Сategory')
     ->setApplication('Shuchkin\SimpleXLSXGen')
+
+// Set Protected WorkBook Structure
+$xlsx->setProtectedWorkBook()
+
+/**
+ * @TODO Set Prtoected Sheet
+ * Set Premissions to edit. 
+ * If the premissions are not specified, then Excel treats it as not allowed. Or you can specify all permissions 0 - allowed 1 - not allowed.
+ * formatCells - Format Cell 
+ * formatColumns - Format Colums
+ * formatRows - Format - Rows
+ * insertColumns - Insert Colums
+ * insertRows - Insert Rows
+ * insertHyperlinks Insert Hyperlinks
+ * deleteColumns - Delete Columns
+ * deleteRows - Delete Rows 
+ * sort - Sort
+ * autoFilter - Auto Filter 
+ * pivotTables Pivot Table
+*/
+$xlsx->setProtectedSheet(["formatCells" => 0, "formatColumns" => 0, "formatRows" => 0, "autoFilter" => 1]) // Allowed Format Cell, Format Colums, Format Rows, Not Allowed Auto Filter 
 ```
 ### JS array to Excel (AJAX)
 ```php
