@@ -1072,6 +1072,11 @@ class SimpleXLSXGen
         $this->application = $application;
         return $this;
     }
+    public function setLastModifiedBy($lastModifiedBy)
+    {
+        $this->lastModifiedBy = $lastModifiedBy;
+        return $this;
+    }
 
     public function setLastModifiedBy($lastModifiedBy)
     {
