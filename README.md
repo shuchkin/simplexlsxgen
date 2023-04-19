@@ -144,15 +144,16 @@ $xlsx->rightToLeft();
 
 // Set Meta Data Files
 // this data in propertis Files and Info file in Office 
-$xlsx->setAuthor("Sergey Shuchkin")
-$xlsx->setCompany("Sergey Shuchkin Company")
-$xlsx->setManager("Sergey Shuchkin Manager")
-$xlsx->setTitle("This is Title")
-$xlsx->setSubject("This is Subject")
-$xlsx->setKeywords("Keywords1, Keywords2, Keywords3, KeywordsN")
-$xlsx->setDescription("This is Description")
-$xlsx->setCategory("This is Сategory")
-$xlsx->setApplication("This Is Best Application For Generate")
+$xlsx->setAuthor('Sergey Shuchkin <sergey.shuchkin@gmail.com>')
+    ->setCompany('Microsoft <info@microsoft.com>')
+    ->setManager('Bill Gates <bill.gates@microsoft.com>')
+    ->setLastModifiedBy("Sergey Shuchkin <sergey.shuchkin@gmail.com>")
+    ->setTitle('This is Title')
+    ->setSubject('This is Subject')
+    ->setKeywords('Keywords1, Keywords2, Keywords3, KeywordsN')
+    ->setDescription('This is Description')
+    ->setCategory('This is Сategory')
+    ->setApplication('Shuchkin\SimpleXLSXGen')
 ```
 ### JS array to Excel (AJAX)
 ```php
