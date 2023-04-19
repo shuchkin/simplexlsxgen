@@ -142,6 +142,18 @@ $xlsx->freezePanes('C3');
 // Column A is on the far right, Column B is one column left of Column A, and so on. Also, information in cells is displayed in the Right to Left format.
 $xlsx->rightToLeft();
 
+// Set Meta Data Files
+// this data in propertis Files and Info file in Office 
+$xlsx->setAuthor('Sergey Shuchkin <sergey.shuchkin@gmail.com>')
+    ->setCompany('Microsoft <info@microsoft.com>')
+    ->setManager('Bill Gates <bill.gates@microsoft.com>')
+    ->setLastModifiedBy("Sergey Shuchkin <sergey.shuchkin@gmail.com>")
+    ->setTitle('This is Title')
+    ->setSubject('This is Subject')
+    ->setKeywords('Keywords1, Keywords2, Keywords3, KeywordsN')
+    ->setDescription('This is Description')
+    ->setCategory('This is Сategory')
+    ->setApplication('Shuchkin\SimpleXLSXGen')
 ```
 ### JS array to Excel (AJAX)
 ```php

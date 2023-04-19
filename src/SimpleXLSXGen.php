@@ -1,4 +1,6 @@
-<?php /** @noinspection ReturnTypeCanBeDeclaredInspection */
+<?php
+
+/** @noinspection ReturnTypeCanBeDeclaredInspection */
 /** @noinspection PhpMissingReturnTypeInspection */
 /** @noinspection NullCoalescingOperatorCanBeUsedInspection */
 
@@ -27,6 +29,17 @@ class SimpleXLSXGen
     protected $SI; // shared strings
     protected $SI_KEYS;
     protected $extLinkId;
+
+    protected $title;
+    protected $subject;
+    protected $author;
+    protected $company;
+    protected $manager;
+    protected $description;
+    protected $application;
+    protected $keywords;
+    protected $category;
+    protected $lastModifiedBy;
     const N_NORMAL = 0; // General
     const N_INT = 1; // 0
     const N_DEC = 2; // 0.00
@@ -78,6 +91,17 @@ class SimpleXLSXGen
 
     public function __construct()
     {
+        $this->subject = '';
+        $this->title = '';
+        $this->author = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
+        $this->company = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
+        $this->manager = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
+        $this->description = '';
+        $this->keywords = '';
+        $this->category = '';
+        $this->lastModifiedBy = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
+        $this->application = __CLASS__;
+
         $this->curSheet = -1;
         $this->defaultFont = 'Calibri';
         $this->defaultFontSize = 10;
@@ -118,7 +142,6 @@ class SimpleXLSXGen
         ];
         $this->XF_KEYS[implode('-', $this->XF[0])] = 0; // & keys
         $this->XF_KEYS[implode('-', $this->XF[1])] = 1;
-
         $this->template = [
             '_rels/.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
@@ -129,12 +152,21 @@ class SimpleXLSXGen
             'docProps/app.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
 <TotalTime>0</TotalTime>
-<Application>' . __CLASS__ . '</Application>
+<Application>{APP}</Application>
+<Company>{COMPANY}</Company>
+<Manager>{MANAGER}</Manager>
 </Properties>',
             'docProps/core.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 <dcterms:created xsi:type="dcterms:W3CDTF">{DATE}</dcterms:created>
-<dc:language>en-US</dc:language>
+    <dc:title>{TITLE}</dc:title>
+    <dc:subject>{SUBJECT}</dc:subject>
+    <dc:creator>{AUTHOR}</dc:creator>
+    <cp:lastModifiedBy>{LAST_MODIFY_BY}</cp:lastModifiedBy>
+    <cp:keywords>{KEYWORD}</cp:keywords>
+    <dc:description>{DESCRIPTION}</dc:description>
+    <cp:category>{CATEGORY}</cp:category>
+    <dc:language>en-US</dc:language>
 <dcterms:modified xsi:type="dcterms:W3CDTF">{DATE}</dcterms:modified>
 <cp:revision>1</cp:revision>
 </cp:coreProperties>',
@@ -166,7 +198,7 @@ class SimpleXLSXGen
 </styleSheet>',
             'xl/workbook.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-<fileVersion appName="' . __CLASS__ . '"/>
+<fileVersion appName="{APP}"/>
 <sheets>
 {SHEETS}
 </sheets>
@@ -301,7 +333,7 @@ class SimpleXLSXGen
                     $s .= '<Relationship Id="rId' . ($i + 1) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet"' .
                         ' Target="worksheets/sheet' . ($i + 1) . ".xml\"/>\r\n";
                 }
-                $s .= '<Relationship Id="rId' . ($i + 1) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>'."\r\n";
+                $s .= '<Relationship Id="rId' . ($i + 1) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>' . "\r\n";
                 $s .= '<Relationship Id="rId' . ($i + 2) . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/sharedStrings" Target="sharedStrings.xml"/>';
 
                 $template = str_replace('{RELS}', $s, $template);
@@ -312,11 +344,21 @@ class SimpleXLSXGen
                 foreach ($this->sheets as $k => $v) {
                     $s .= '<sheet name="' . $this->esc($v['name']) . '" sheetId="' . ($k + 1) . '" r:id="rId' . ($k + 1) . '"/>';
                 }
-                $template = str_replace('{SHEETS}', $s, $template);
+                $search = ['{SHEETS}', '{APP}'];
+                $replace = [$s, $this->esc($this->application)];
+                $template = str_replace($search, $replace, $template);
+                $this->_writeEntry($fh, $cdrec, $cfilename, $template);
+                $entries++;
+            } elseif ($cfilename === 'docProps/app.xml') {
+                $search = ['{APP}', '{COMPANY}', '{MANAGER}'];
+                $replace = [$this->esc($this->application), $this->esc($this->company), $this->esc($this->manager)];
+                $template = str_replace($search, $replace, $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
             } elseif ($cfilename === 'docProps/core.xml') {
-                $template = str_replace('{DATE}', gmdate('Y-m-d\TH:i:s\Z'), $template);
+                $search = ['{DATE}', '{AUTHOR}', '{TITLE}', '{SUBJECT}', '{KEYWORD}', '{DESCRIPTION}', '{CATEGORY}', '{LAST_MODIFY_BY}'];
+                $replace = [gmdate('Y-m-d\TH:i:s\Z'), $this->esc($this->author), $this->esc($this->title), $this->esc($this->subject), $this->esc($this->keywords), $this->esc($this->description), $this->esc($this->category), $this->esc($this->lastModifiedBy)];
+                $template = str_replace($search, $replace, $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
             } elseif ($cfilename === 'xl/sharedStrings.xml') {
@@ -441,9 +483,9 @@ class SimpleXLSXGen
                                 $ba[] = $ba[0];
                             }
                             if (!isset($ba[4])) { // diagonal
-                                 $ba[] = 'none';
+                                $ba[] = 'none';
                             }
-                            $sides = [ 'left' => 3, 'right' => 1, 'top' => 0, 'bottom' => 2, 'diagonal' => 4];
+                            $sides = ['left' => 3, 'right' => 1, 'top' => 0, 'bottom' => 2, 'diagonal' => 4];
                             foreach ($sides as $side => $idx) {
                                 $s = 'thin';
                                 $c = '';
@@ -514,6 +556,7 @@ class SimpleXLSXGen
         fwrite($fh, pack('V', $before_cd));         // offset to start of central dir
         fwrite($fh, pack('v', mb_strlen($zipComments, '8bit'))); // .zip file comment length
         fwrite($fh, $zipComments);
+
         return true;
     }
 
@@ -599,12 +642,12 @@ class SimpleXLSXGen
         setlocale(LC_NUMERIC, 'C');
         $COLS = [];
         $ROWS = [];
-//        $SHEETVIEWS = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"'.($this->rtl ? ' rightToLeft="1"' : '').'>';
+        //        $SHEETVIEWS = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"'.($this->rtl ? ' rightToLeft="1"' : '').'>';
         $SHEETVIEWS = '';
         $PANE = '';
         if (count($this->sheets[$idx]['rows'])) {
             if ($this->sheets[$idx]['frozen'] !== '' || isset($this->sheets[$idx]['frozen'][0]) || isset($this->sheets[$idx]['frozen'][1])) {
-//                $AC = 'A1'; // Active Cell
+                //                $AC = 'A1'; // Active Cell
                 $x = $y = 0;
                 if (is_string($this->sheets[$idx]['frozen'])) {
                     $AC = $this->sheets[$idx]['frozen'];
@@ -709,8 +752,8 @@ class SimpleXLSXGen
                                     if (preg_match('/ font-size="([^"]+)"/', $m[1], $m2)) {
                                         $FS = (int)$m2[1];
                                         if ($RH === 0) { // fix row height
-                                           $RH = ($FS > $this->defaultFontSize) ? round($FS * 1.50,1) : 0;
-					                    }
+                                            $RH = ($FS > $this->defaultFontSize) ? round($FS * 1.50, 1) : 0;
+                                        }
                                     }
                                 }
                                 if (strpos($v, '<left>') !== false) {
@@ -919,7 +962,8 @@ class SimpleXLSXGen
         //restore locale
         setlocale(LC_NUMERIC, $_loc);
 
-        return str_replace(['{REF}', '{COLS}', '{ROWS}', '{AUTOFILTER}', '{MERGECELLS}', '{HYPERLINKS}', '{SHEETVIEWS}'],
+        return str_replace(
+            ['{REF}', '{COLS}', '{ROWS}', '{AUTOFILTER}', '{MERGECELLS}', '{HYPERLINKS}', '{SHEETVIEWS}'],
             [
                 $REF,
                 implode("\r\n", $COLS),
@@ -929,7 +973,8 @@ class SimpleXLSXGen
                 implode("\r\n", $HYPERLINKS),
                 $SHEETVIEWS
             ],
-            $template);
+            $template
+        );
     }
 
     public function num2name($num)
@@ -981,6 +1026,64 @@ class SimpleXLSXGen
         return $this;
     }
 
+    public function setTitle($title)
+    {
+        $this->title = $title;
+        return $this;
+    }
+    public function setSubject($subject)
+    {
+        $this->subject = $subject;
+        return $this;
+    }
+    public function setAuthor($author)
+    {
+        $this->author = $author;
+        return $this;
+    }
+    public function setCompany($company)
+    {
+        $this->company = $company;
+        return $this;
+    }
+    public function setManager($manager)
+    {
+        $this->manager = $manager;
+        return $this;
+    }
+    public function setKeywords($keywords)
+    {
+        $this->keywords = $keywords;
+        return $this;
+    }
+    public function setDescription($description)
+    {
+        $this->description = $description;
+        return $this;
+    }
+    public function setCategory($category)
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    public function setApplication($application)
+    {
+        $this->application = $application;
+        return $this;
+    }
+    public function setLastModifiedBy($lastModifiedBy)
+    {
+        $this->lastModifiedBy = $lastModifiedBy;
+        return $this;
+    }
+
+    public function setLastModifiedBy($lastModifiedBy)
+    {
+        $this->lastModifiedBy = $lastModifiedBy;
+        return $this;
+    }
+
     public function autoFilter($range)
     {
         $this->sheets[$this->curSheet]['autofilter'] = $range;
@@ -998,7 +1101,8 @@ class SimpleXLSXGen
         $this->sheets[$this->curSheet]['colwidth'][$col] = $width;
         return $this;
     }
-    public function rightToLeft($value = true) {
+    public function rightToLeft($value = true)
+    {
         $this->rtl = $value;
         return $this;
     }
@@ -1047,8 +1151,8 @@ class SimpleXLSXGen
         if ($lettercount > 0) {
             $x = ord($cell[$lettercount - 1]) - ord('A');
             $e = 1;
-            for ($i = $lettercount - 2 ; $i >= 0 ; $i--) {
-                $x += (ord($cell[$i]) - ord('A') + 1) * (26**$e);
+            for ($i = $lettercount - 2; $i >= 0; $i--) {
+                $x += (ord($cell[$i]) - ord('A') + 1) * (26 ** $e);
                 $e++;
             }
         }
@@ -1063,7 +1167,7 @@ class SimpleXLSXGen
         for ($i = $x; $i >= 0; $i = ((int)($i / 26)) - 1) {
             $c = chr(ord('A') + $i % 26) . $c;
         }
-        return $c . ($y+1);
+        return $c . ($y + 1);
     }
 
     public function freezePanes($cell)
