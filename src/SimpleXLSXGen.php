@@ -1078,12 +1078,6 @@ class SimpleXLSXGen
         return $this;
     }
 
-    public function setLastModifiedBy($lastModifiedBy)
-    {
-        $this->lastModifiedBy = $lastModifiedBy;
-        return $this;
-    }
-
     public function autoFilter($range)
     {
         $this->sheets[$this->curSheet]['autofilter'] = $range;
