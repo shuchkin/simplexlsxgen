@@ -342,7 +342,7 @@ class SimpleXLSXGen
                     $s .= '<sheet name="' . $this->esc($v['name']) . '" sheetId="' . ($k + 1) . '" r:id="rId' . ($k + 1) . '"/>';
                 }
                 $search = ['{SHEETS}', '{APP}'];
-                $replace = [$s, $this->template];
+                $replace = [$s, $this->application];
                 $template = str_replace($search, $replace, $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
