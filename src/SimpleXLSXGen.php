@@ -40,8 +40,8 @@ class SimpleXLSXGen
     protected $keywords;
     protected $category;
     protected $lastModifiedBy;
-    protected bool $prtoectedWorkbook;
-    protected array $prtoectedSheet;
+    protected $isProtectedWorkbook;
+    protected $isPrtoectedSheet;
     const N_NORMAL = 0; // General
     const N_INT = 1; // 0
     const N_DEC = 2; // 0.00
@@ -104,8 +104,8 @@ class SimpleXLSXGen
         $this->lastModifiedBy = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
         $this->application = __CLASS__;
 
-        $this->prtoectedWorkbook = false;
-        $this->prtoectedSheet = [];
+        $this->isProtectedWorkbook = false;
+        $this->isPrtoectedSheet = [];
 
         $this->curSheet = -1;
         $this->defaultFont = 'Calibri';
@@ -347,7 +347,7 @@ class SimpleXLSXGen
                 $entries++;
             } elseif ($cfilename === 'xl/workbook.xml') {
                 $prtoectedWorkbook = '<workbookProtection lockStructure="1"/>';
-                if ($this->prtoectedWorkbook == false) {
+                if ($this->isProtectedWorkbook == false) {
                     $prtoectedWorkbook = '';
                 }
                 $s = '';
@@ -946,9 +946,9 @@ class SimpleXLSXGen
         }
 
         $protectedSheet = '';
-        if (is_array($this->prtoectedSheet) and count($this->prtoectedSheet) > 0) {
+        if (is_array($this->sheets[$idx]['isPrtoectedSheet']) and count($this->sheets[$idx]['isPrtoectedSheet']) > 0) {
             $premissions = 'sheet="1" ';
-            foreach ($this->prtoectedSheet as $namePremissions => $valuePremissions) {
+            foreach ($this->sheets[$idx]['isPrtoectedSheet'] as $namePremissions => $valuePremissions) {
                 $premissions .= $namePremissions . '="' . (int)$valuePremissions . '" ';
             }
             $protectedSheet = '<sheetProtection ' . $premissions . '/>';
@@ -1099,13 +1099,13 @@ class SimpleXLSXGen
 
     public function setProtectedWorkBook()
     {
-        $this->prtoectedWorkbook = true;
+        $this->isProtectedWorkbook = true;
         return $this;
     }
 
     public function setProtectedSheet(array $prtoectedSheet)
     {
-        $this->prtoectedSheet = $prtoectedSheet;
+        $this->sheets[$this->curSheet]['isPrtoectedSheet'] = $prtoectedSheet;
         return $this;
     }
 
