@@ -366,8 +366,13 @@ class SimpleXLSXGen
                     $this->SI[] = 'No Data';
                 }
                 $si_cnt = count($this->SI);
-                $si = '<si><t>' . implode("</t></si>\r\n<si><t>", $this->SI) . '</t></si>';
-                $template = str_replace(['{CNT}', '{STRINGS}'], [$si_cnt, $si], $template);
+                $si = [];
+                $si[] = '<si>';
+                foreach($this->SI as $s) {
+                    $si[] = preg_match('/^\s|\s$/', $s) ? '<t xml:space="preserve">'.$s.'</t>' : '<t>'.$s.'</t>';
+                }
+                $si[] = '</si>';
+                $template = str_replace(['{CNT}', '{STRINGS}'], [$si_cnt, implode("\r\n", $si) ], $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
             } elseif ($cfilename === 'xl/worksheets/sheet1.xml') {
