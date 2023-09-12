@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.16 (2023-09-10)
+## 1.3.16 (2023-09-12)
 * preserve leading or traling spaces
 
 ## 1.3.15 (2023-04-19)
