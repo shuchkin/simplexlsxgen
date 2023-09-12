@@ -39,6 +39,7 @@ class SimpleXLSXGen
     protected $application;
     protected $keywords;
     protected $category;
+    protected $language;
     protected $lastModifiedBy;
     const N_NORMAL = 0; // General
     const N_INT = 1; // 0
@@ -93,13 +94,14 @@ class SimpleXLSXGen
     {
         $this->subject = '';
         $this->title = '';
-        $this->author = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
-        $this->company = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
-        $this->manager = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
+        $this->author = '';
+        $this->company = '';
+        $this->manager = '';
         $this->description = '';
         $this->keywords = '';
         $this->category = '';
-        $this->lastModifiedBy = 'Sergey Shuchkin <sergey.shuchkin@gmail.com>';
+        $this->language = 'en-US';
+        $this->lastModifiedBy = '';
         $this->application = __CLASS__;
 
         $this->curSheet = -1;
@@ -143,81 +145,64 @@ class SimpleXLSXGen
         $this->XF_KEYS[implode('-', $this->XF[0])] = 0; // & keys
         $this->XF_KEYS[implode('-', $this->XF[1])] = 1;
         $this->template = [
-            '_rels/.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
-<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>
-<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>
-</Relationships>',
-            'docProps/app.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">
-<TotalTime>0</TotalTime>
-<Application>{APP}</Application>
-<Company>{COMPANY}</Company>
-<Manager>{MANAGER}</Manager>
-</Properties>',
-            'docProps/core.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-<dcterms:created xsi:type="dcterms:W3CDTF">{DATE}</dcterms:created>
-    <dc:title>{TITLE}</dc:title>
-    <dc:subject>{SUBJECT}</dc:subject>
-    <dc:creator>{AUTHOR}</dc:creator>
-    <cp:lastModifiedBy>{LAST_MODIFY_BY}</cp:lastModifiedBy>
-    <cp:keywords>{KEYWORD}</cp:keywords>
-    <dc:description>{DESCRIPTION}</dc:description>
-    <cp:category>{CATEGORY}</cp:category>
-    <dc:language>en-US</dc:language>
-<dcterms:modified xsi:type="dcterms:W3CDTF">{DATE}</dcterms:modified>
-<cp:revision>1</cp:revision>
-</cp:coreProperties>',
-            'xl/_rels/workbook.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-{RELS}
-</Relationships>',
-            'xl/worksheets/sheet1.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-<dimension ref="{REF}"/>
-{SHEETVIEWS}
-{COLS}
-<sheetData>{ROWS}</sheetData>
-{AUTOFILTER}{MERGECELLS}{HYPERLINKS}
-</worksheet>',
-            'xl/worksheets/_rels/sheet1.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{HYPERLINKS}</Relationships>',
-            'xl/sharedStrings.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="{CNT}" uniqueCount="{CNT}">{STRINGS}</sst>',
-            'xl/styles.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
-{NUMFMTS}
-{FONTS}
-{FILLS}
-{BORDERS}
-<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" /></cellStyleXfs>
-{XF}
-<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>
-</styleSheet>',
-            'xl/workbook.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
-<fileVersion appName="{APP}"/>
-<sheets>
-{SHEETS}
-</sheets>
-</workbook>',
-            '[Content_Types].xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-<Override PartName="/rels/.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>
-<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>
-<Override PartName="/xl/_rels/workbook.xml.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>
-<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
-<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
-{TYPES}
-</Types>',
+            '_rels/.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'."\r\n"
+                .'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>'."\r\n"
+                .'<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/>'."\r\n"
+                .'<Relationship Id="rId3" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/>'."\r\n"
+                .'</Relationships>',
+            'docProps/app.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                .'<Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties">'."\r\n"
+                .'<TotalTime>0</TotalTime>'."\r\n"
+                .'<Application>{APP}</Application>'."\r\n"
+                .'<Company>{COMPANY}</Company>'."\r\n"
+                .'<Manager>{MANAGER}</Manager>'."\r\n"
+                .'</Properties>',
+            'docProps/core.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                .'<cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:dcmitype="http://purl.org/dc/dcmitype/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'."\r\n"
+                .'<dcterms:created xsi:type="dcterms:W3CDTF">{DATE}</dcterms:created>'."\r\n"
+                .'<dc:title>{TITLE}</dc:title>'."\r\n"
+                .'<dc:subject>{SUBJECT}</dc:subject>'."\r\n"
+                .'<dc:creator>{AUTHOR}</dc:creator>'."\r\n"
+                .'<cp:lastModifiedBy>{LAST_MODIFY_BY}</cp:lastModifiedBy>'."\r\n"
+                .'<cp:keywords>{KEYWORD}</cp:keywords>'."\r\n"
+                .'<dc:description>{DESCRIPTION}</dc:description>'."\r\n"
+                .'<cp:category>{CATEGORY}</cp:category>'."\r\n"
+                .'<dc:language>{LANGUAGE}</dc:language>'."\r\n"
+                .'<dcterms:modified xsi:type="dcterms:W3CDTF">{DATE}</dcterms:modified>'."\r\n"
+                .'<cp:revision>1</cp:revision>'."\r\n"
+                .'</cp:coreProperties>',
+            'xl/_rels/workbook.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
+                ."\r\n{RELS}\r\n</Relationships>",
+            'xl/worksheets/sheet1.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                .'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'."\r\n"
+                .'<dimension ref="{REF}"/>'."\r\n"
+                ."{SHEETVIEWS}\r\n{COLS}\r\n<sheetData>{ROWS}</sheetData>\r\n{AUTOFILTER}{MERGECELLS}{HYPERLINKS}</worksheet>",
+            'xl/worksheets/_rels/sheet1.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{HYPERLINKS}</Relationships>',
+            'xl/sharedStrings.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                .'<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="{CNT}" uniqueCount="{CNT}">{STRINGS}</sst>',
+            'xl/styles.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                .'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+                ."\r\n{NUMFMTS}\r\n{FONTS}\r\n{FILLS}\r\n{BORDERS}\r\n"
+                .'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" /></cellStyleXfs>'
+                ."\r\n{XF}\r\n"
+                .'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>',
+            'xl/workbook.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                .'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'."\r\n"
+                .'<fileVersion appName="{APP}"/><sheets>{SHEETS}</sheets></workbook>',
+            '[Content_Types].xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                .'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'."\r\n"
+                .'<Override PartName="/rels/.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'."\r\n"
+                .'<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>'."\r\n"
+                .'<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>'."\r\n"
+                .'<Override PartName="/xl/_rels/workbook.xml.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'."\r\n"
+                .'<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>'."\r\n"
+                .'<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
+<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
+                ."\r\n{TYPES}</Types>",
         ];
-        // <col min="1" max="1" width="22.1796875" bestFit="1" customWidth="1"/>
-        // <row r="1" spans="1:2" x14ac:dyDescent="0.35"><c r="A1" t="s"><v>0</v></c><c r="B1"><v>100</v></c></row><row r="2" spans="1:2" x14ac:dyDescent="0.35"><c r="A2" t="s"><v>1</v></c><c r="B2"><v>200</v></c></row>
-        // <si><t>Простой шаблон</t></si><si><t>Будем делать генератор</t></si>
     }
 
     public static function fromArray(array $rows, $sheetName = null)
@@ -356,8 +341,8 @@ class SimpleXLSXGen
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
             } elseif ($cfilename === 'docProps/core.xml') {
-                $search = ['{DATE}', '{AUTHOR}', '{TITLE}', '{SUBJECT}', '{KEYWORD}', '{DESCRIPTION}', '{CATEGORY}', '{LAST_MODIFY_BY}'];
-                $replace = [gmdate('Y-m-d\TH:i:s\Z'), $this->esc($this->author), $this->esc($this->title), $this->esc($this->subject), $this->esc($this->keywords), $this->esc($this->description), $this->esc($this->category), $this->esc($this->lastModifiedBy)];
+                $search = ['{DATE}', '{AUTHOR}', '{TITLE}', '{SUBJECT}', '{KEYWORD}', '{DESCRIPTION}', '{CATEGORY}', '{LANGUAGE}', '{LAST_MODIFY_BY}'];
+                $replace = [gmdate('Y-m-d\TH:i:s\Z'), $this->esc($this->author), $this->esc($this->title), $this->esc($this->subject), $this->esc($this->keywords), $this->esc($this->description), $this->esc($this->category), $this->esc($this->language), $this->esc($this->lastModifiedBy)];
                 $template = str_replace($search, $replace, $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
@@ -367,11 +352,9 @@ class SimpleXLSXGen
                 }
                 $si_cnt = count($this->SI);
                 $si = [];
-                $si[] = '<si>';
                 foreach($this->SI as $s) {
-                    $si[] = preg_match('/^\s|\s$/', $s) ? '<t xml:space="preserve">'.$s.'</t>' : '<t>'.$s.'</t>';
+                    $si[] = '<si>'.(preg_match('/^\s|\s$/', $s) ? '<t xml:space="preserve">'.$s.'</t>' : '<t>'.$s.'</t>').'</si>';
                 }
-                $si[] = '</si>';
                 $template = str_replace(['{CNT}', '{STRINGS}'], [$si_cnt, implode("\r\n", $si) ], $template);
                 $this->_writeEntry($fh, $cdrec, $cfilename, $template);
                 $entries++;
@@ -1069,6 +1052,12 @@ class SimpleXLSXGen
     public function setCategory($category)
     {
         $this->category = $category;
+        return $this;
+    }
+
+    public function setLanguage($language)
+    {
+        $this->language = $language;
         return $this;
     }
 
