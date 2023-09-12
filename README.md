@@ -154,6 +154,7 @@ $xlsx->setAuthor('Sergey Shuchkin <sergey.shuchkin@gmail.com>')
     ->setKeywords('Keywords1, Keywords2, Keywords3, KeywordsN')
     ->setDescription('This is Description')
     ->setCategory('This is Сategory')
+    ->setLanguage('en-US')
     ->setApplication('Shuchkin\SimpleXLSXGen')
 ```
 ### JS array to Excel (AJAX)
