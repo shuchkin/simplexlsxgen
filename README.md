@@ -54,8 +54,8 @@ $data = [
     ['Hyperlink', 'https://github.com/shuchkin/simplexlsxgen'],
     ['Hyperlink + Anchor', '<a href="https://github.com/shuchkin/simplexlsxgen">SimpleXLSXGen</a>'],
     ['Internal link', '<a href="sheet2!A1">Go to second page</a>'],
-    ['RAW string', "\0" . '2020-10-04 16:02:00']
-    ['Formatted RAW string', '<b><i><raw>2020-10-04 16:02:00</raw></i></b>']
+    ['RAW string', "\0" . '2020-10-04 16:02:00'],
+    ['Formatted RAW string', '<b><i><raw>2020-10-04 16:02:00</raw></i></b>'],
 ];
 SimpleXLSXGen::fromArray($data)->saveAs('datatypes.xlsx');
 ```
