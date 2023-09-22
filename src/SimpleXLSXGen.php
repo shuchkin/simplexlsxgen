@@ -786,6 +786,7 @@ class SimpleXLSXGen
                                 if (preg_match('/<a href="([^"]+![^"]+)">(.*?)<\/a>/i', $v, $m)) {
                                     $this->sheets[$idx]['hyperlinks'][] = ['ID' => null, 'R' => $cname, 'H' => null, 'L' => $m[1]];
                                     $F += self::F_HYPERLINK; // internal hyperlink
+                                }
                                 if (!is_null($rv)) {
                                     $v = $rv;
                                 } else {
