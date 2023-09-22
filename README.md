@@ -55,6 +55,7 @@ $data = [
     ['Hyperlink + Anchor', '<a href="https://github.com/shuchkin/simplexlsxgen">SimpleXLSXGen</a>'],
     ['Internal link', '<a href="sheet2!A1">Go to second page</a>'],
     ['RAW string', "\0" . '2020-10-04 16:02:00']
+    ['Formatted RAW string', '<b><i><raw>2020-10-04 16:02:00</raw></i></b>']
 ];
 SimpleXLSXGen::fromArray($data)->saveAs('datatypes.xlsx');
 ```
@@ -99,7 +100,7 @@ SimpleXLSXGen::fromArray($data)
 ![XLSX screenshot](styles.png)
 
 ### RAW Strings
-Prefix #0 cell value (use double quotes).
+Prefix #0 cell value (use double quotes) OR use <raw> tags.
 ```php
 $PushkinDOB = '1799-07-06';
 $data = [
@@ -107,7 +108,9 @@ $data = [
     ['Date as raw string', "\0".$PushkinDOB],
     ['Disable type detection', "\0".'+12345'],
     ['Insert greater/less them simbols', "\0".'20- short term: <6 month'],
-
+    ['Datetime as raw string', '<raw>2023-01-09 11:16:34</raw>'],
+    ['Datetime as raw string in Green text', '<style color="#00FF00"><raw>2023-01-09 11:16:34</raw></style>'],
+    ['Printed <b> tags in Red', '<style color="#FF0000"><raw><b>This is how you bold text in HTML</b></raw></style>'],
 ];
 SimpleXLSXGen::fromArray($data)
     ->saveAs('test_rawstrings.xlsx');
