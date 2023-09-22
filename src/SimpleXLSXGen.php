@@ -692,7 +692,7 @@ class SimpleXLSXGen
                         $row .= '<c r="' . $cname . '"/>';
                         continue;
                     }
-                    $ct = $cv = $cf = null;
+                    $ct = $cv = $cf = $rv = null;
                     $N = $A = $F = $FL = $C = $BG = $FS = 0;
                     $BR = '';
                     if (is_string($v)) {
@@ -701,6 +701,13 @@ class SimpleXLSXGen
                             $vl = mb_strlen($v);
                         } else {
                             if (strpos($v, '<') !== false) { // tags?
+                                if (strpos($v, '<raw>') !== false) {
+                                   preg_match('~<raw>([^{]*)</raw>~i', $v, $rva);
+                                   if (isset($rva[1])) {
+                                       $rv = $rva[1];
+                                       $v = str_replace($rv, '', $v);
+                                   }
+                                }
                                 if (strpos($v, '<b>') !== false) {
                                     $F += self::F_BOLD;
                                 }
@@ -779,76 +786,84 @@ class SimpleXLSXGen
                                 if (preg_match('/<a href="([^"]+![^"]+)">(.*?)<\/a>/i', $v, $m)) {
                                     $this->sheets[$idx]['hyperlinks'][] = ['ID' => null, 'R' => $cname, 'H' => null, 'L' => $m[1]];
                                     $F += self::F_HYPERLINK; // internal hyperlink
-                                }
-                                if (preg_match('/<f([^>]*)>/', $v, $m)) {
-                                    $cf = strip_tags($v);
-                                    $v = 'formula';
-                                    if (preg_match('/ v="([^"]+)"/', $m[1], $m2)) {
-                                        $v = $m2[1];
-                                    }
+                                if (!is_null($rv)) {
+                                    $v = $rv;
                                 } else {
-                                    $v = strip_tags($v);
+                                    if (preg_match('/<f([^>]*)>/', $v, $m)) {
+                                        $cf = strip_tags($v);
+                                        $v = 'formula';
+                                        if (preg_match('/ v="([^"]+)"/', $m[1], $m2)) {
+                                            $v = $m2[1];
+                                        }
+                                    } else {
+                                        $v = strip_tags($v);
+                                    }
                                 }
                             } // tags
-                            $vl = mb_strlen($v);
-                            if ($N) {
-                                $cv = ltrim($v, '+');
-                            } elseif ($v === '0' || preg_match('/^[-+]?[1-9]\d{0,14}$/', $v)) { // Integer as General
-                                $cv = ltrim($v, '+');
-                                if ($vl > 10) {
-                                    $N = self::N_INT; // [1] 0
+                            if($rv === null){
+                                $vl = mb_strlen($v);
+                                if ($N) {
+                                    $cv = ltrim($v, '+');
+                                } elseif ($v === '0' || preg_match('/^[-+]?[1-9]\d{0,14}$/', $v)) { // Integer as General
+                                    $cv = ltrim($v, '+');
+                                    if ($vl > 10) {
+                                        $N = self::N_INT; // [1] 0
+                                    }
+                                } elseif (preg_match('/^[-+]?(0|[1-9]\d*)\.(\d+)$/', $v, $m)) {
+                                    $cv = ltrim($v, '+');
+                                    if (strlen($m[2]) < 3) {
+                                        $N = self::N_DEC;
+                                    }
+                                } elseif (preg_match('/^\$[-+]?[0-9\.]+$/', $v)) { // currency $?
+                                    $N = self::N_DOLLAR;
+                                    $cv = ltrim($v, '+$');
+                                } elseif (preg_match('/^[-+]?[0-9\.]+( ₽| €)$/u', $v, $m)) { // currency ₽ €?
+                                    if ($m[1] === ' ₽') {
+                                        $N = self::N_RUB;
+                                    } elseif ($m[1] === ' €') {
+                                        $N = self::N_EURO;
+                                    }
+                                    $cv = trim($v, ' +₽€');
+                                } elseif (preg_match('/^([-+]?\d+)%$/', $v, $m)) {
+                                    $cv = round($m[1] / 100, 2);
+                                    $N = self::N_PERCENT_INT; // [9] 0%
+                                } elseif (preg_match('/^([-+]?\d+\.\d+)%$/', $v, $m)) {
+                                    $cv = round($m[1] / 100, 4);
+                                    $N = self::N_PRECENT_DEC; // [10] 0.00%
+                                } elseif (preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d)$/', $v, $m)) {
+                                    $cv = $this->date2excel($m[1], $m[2], $m[3]);
+                                    $N = self::N_DATE; // [14] mm-dd-yy
+                                } elseif (preg_match('/^(\d\d)\/(\d\d)\/(\d\d\d\d)$/', $v, $m)) {
+                                    $cv = $this->date2excel($m[3], $m[2], $m[1]);
+                                    $N = self::N_DATE; // [14] mm-dd-yy
+                                } elseif (preg_match('/^(\d\d):(\d\d):(\d\d)$/', $v, $m)) {
+                                    $cv = $this->date2excel(0, 0, 0, $m[1], $m[2], $m[3]);
+                                    $N = self::N_TIME; // time
+                                } elseif (preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m)) {
+                                    $cv = $this->date2excel($m[1], $m[2], $m[3], $m[4], $m[5], $m[6]);
+                                    $N = ((int)$m[1] === 0) ? self::N_TIME : self::N_DATETIME; // [22] m/d/yy h:mm
+                                } elseif (preg_match('/^(\d\d)\/(\d\d)\/(\d\d\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m)) {
+                                    $cv = $this->date2excel($m[3], $m[2], $m[1], $m[4], $m[5], $m[6]);
+                                    $N = self::N_DATETIME; // [22] m/d/yy h:mm
+                                } elseif (preg_match('/^[0-9+-.]+$/', $v)) { // Long ?
+                                    $A += ($A & (self::A_LEFT | self::A_CENTER)) ? 0 : self::A_RIGHT;
+                                } elseif (preg_match('/^https?:\/\/\S+$/i', $v)) {
+                                    $h = explode('#', $v);
+                                    $this->extLinkId++;
+                                    $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $h[0], 'L' => isset($h[1]) ? $h[1] : ''];
+                                    $F += self::F_HYPERLINK; // Hyperlink
+                                } elseif (preg_match("/^[a-zA-Z0-9_\.\-]+@([a-zA-Z0-9][a-zA-Z0-9\-]*\.)+[a-zA-Z]{2,}$/", $v)) {
+                                    $this->extLinkId++;
+                                    $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => 'mailto:' . $v, 'L' => ''];
+                                    $F += self::F_HYPERLINK; // Hyperlink
                                 }
-                            } elseif (preg_match('/^[-+]?(0|[1-9]\d*)\.(\d+)$/', $v, $m)) {
-                                $cv = ltrim($v, '+');
-                                if (strlen($m[2]) < 3) {
-                                    $N = self::N_DEC;
+                                if (($N === self::N_DATE || $N === self::N_DATETIME) && $cv < 0) {
+                                    $cv = null;
+                                    $N = 0;
                                 }
-                            } elseif (preg_match('/^\$[-+]?[0-9\.]+$/', $v)) { // currency $?
-                                $N = self::N_DOLLAR;
-                                $cv = ltrim($v, '+$');
-                            } elseif (preg_match('/^[-+]?[0-9\.]+( ₽| €)$/u', $v, $m)) { // currency ₽ €?
-                                if ($m[1] === ' ₽') {
-                                    $N = self::N_RUB;
-                                } elseif ($m[1] === ' €') {
-                                    $N = self::N_EURO;
-                                }
-                                $cv = trim($v, ' +₽€');
-                            } elseif (preg_match('/^([-+]?\d+)%$/', $v, $m)) {
-                                $cv = round($m[1] / 100, 2);
-                                $N = self::N_PERCENT_INT; // [9] 0%
-                            } elseif (preg_match('/^([-+]?\d+\.\d+)%$/', $v, $m)) {
-                                $cv = round($m[1] / 100, 4);
-                                $N = self::N_PRECENT_DEC; // [10] 0.00%
-                            } elseif (preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d)$/', $v, $m)) {
-                                $cv = $this->date2excel($m[1], $m[2], $m[3]);
-                                $N = self::N_DATE; // [14] mm-dd-yy
-                            } elseif (preg_match('/^(\d\d)\/(\d\d)\/(\d\d\d\d)$/', $v, $m)) {
-                                $cv = $this->date2excel($m[3], $m[2], $m[1]);
-                                $N = self::N_DATE; // [14] mm-dd-yy
-                            } elseif (preg_match('/^(\d\d):(\d\d):(\d\d)$/', $v, $m)) {
-                                $cv = $this->date2excel(0, 0, 0, $m[1], $m[2], $m[3]);
-                                $N = self::N_TIME; // time
-                            } elseif (preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m)) {
-                                $cv = $this->date2excel($m[1], $m[2], $m[3], $m[4], $m[5], $m[6]);
-                                $N = ((int)$m[1] === 0) ? self::N_TIME : self::N_DATETIME; // [22] m/d/yy h:mm
-                            } elseif (preg_match('/^(\d\d)\/(\d\d)\/(\d\d\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m)) {
-                                $cv = $this->date2excel($m[3], $m[2], $m[1], $m[4], $m[5], $m[6]);
-                                $N = self::N_DATETIME; // [22] m/d/yy h:mm
-                            } elseif (preg_match('/^[0-9+-.]+$/', $v)) { // Long ?
-                                $A += ($A & (self::A_LEFT | self::A_CENTER)) ? 0 : self::A_RIGHT;
-                            } elseif (preg_match('/^https?:\/\/\S+$/i', $v)) {
-                                $h = explode('#', $v);
-                                $this->extLinkId++;
-                                $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $h[0], 'L' => isset($h[1]) ? $h[1] : ''];
-                                $F += self::F_HYPERLINK; // Hyperlink
-                            } elseif (preg_match("/^[a-zA-Z0-9_\.\-]+@([a-zA-Z0-9][a-zA-Z0-9\-]*\.)+[a-zA-Z]{2,}$/", $v)) {
-                                $this->extLinkId++;
-                                $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => 'mailto:' . $v, 'L' => ''];
-                                $F += self::F_HYPERLINK; // Hyperlink
-                            }
-                            if (($N === self::N_DATE || $N === self::N_DATETIME) && $cv < 0) {
-                                $cv = null;
-                                $N = 0;
+                            } else {
+                                $v = $rv;
+                                $vl = mb_strlen($v);
                             }
                         }
                         if ($cv === null) {
