@@ -995,10 +995,10 @@ class SimpleXLSXGen
             $month += 9;
             --$year;
         }
-        $century = substr($year, 0, 2);
-        $decade = substr($year, 2, 2);
+        $century = (int)substr($year, 0, 2);
+        $decade = (int)substr($year, 2, 2);
         //    Calculate the Julian Date, then subtract the Excel base date (JD 2415020 = 31-Dec-1899 Giving Excel Date of 0)
-        $excelDate = floor((146097 * $century) / 4) + floor((1461 * $decade) / 4) + floor((153 * $month + 2) / 5) + $day + 1721119 - $myExcelBaseDate + $excel1900isLeapYear;
+        $excelDate = floor((146097 * $century) / 4) + floor((1461 * $decade) / 4) + floor((153 * (int)$month + 2) / 5) + (int)$day + 1721119 - $myExcelBaseDate + $excel1900isLeapYear;
         return (float)$excelDate + $excelTime;
     }
 
