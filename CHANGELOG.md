@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.17 (2023-10-02)
+* fixed [issue 128](https://github.com/shuchkin/simplexlsxgen/issues/128) date2excel type cast
+
 ## 1.3.16 (2023-09-12)
 * preserve leading or traling spaces
 
