@@ -846,10 +846,12 @@ class SimpleXLSXGen
                                 $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => 'mailto:' . $v, 'L' => ''];
                                 $F += self::F_HYPERLINK; // Hyperlink
                             }
+
                             if (($N === self::N_DATE || $N === self::N_DATETIME) && $cv < 0) {
                                 $cv = null;
                                 $N = 0;
                             }
+
                         }
                         if ($cv === null) {
                             $v = $this->esc($v);
@@ -979,13 +981,17 @@ class SimpleXLSXGen
     public function date2excel($year, $month, $day, $hours = 0, $minutes = 0, $seconds = 0)
     {
         $excelTime = (($hours * 3600) + ($minutes * 60) + $seconds) / 86400;
-        if ((int)$year === 0) {
+        $year = (int) $year;
+        $month = (int) $month;
+        $day = (int) $day;
+//        echo "y=$year m=$month d=$day h=$hours m=$minutes s=$seconds".PHP_EOL;
+        if ($year === 0) {
             return $excelTime;
         }
         // self::CALENDAR_WINDOWS_1900
-        $excel1900isLeapYear = True;
+        $excel1900isLeapYear = 1;
         if (($year === 1900) && ($month <= 2)) {
-            $excel1900isLeapYear = False;
+            $excel1900isLeapYear = 0;
         }
         $myExcelBaseDate = 2415020;
         // Julian base date Adjustment
@@ -995,8 +1001,9 @@ class SimpleXLSXGen
             $month += 9;
             --$year;
         }
-        $century = substr($year, 0, 2);
-        $decade = substr($year, 2, 2);
+        $century = floor($year / 100);
+        $decade = $year - floor($year / 100) * 100;
+//        echo "y=$year m=$month d=$day cent=$century dec=$decade h=$hours m=$minutes s=$seconds".PHP_EOL;
         //    Calculate the Julian Date, then subtract the Excel base date (JD 2415020 = 31-Dec-1899 Giving Excel Date of 0)
         $excelDate = floor((146097 * $century) / 4) + floor((1461 * $decade) / 4) + floor((153 * $month + 2) / 5) + $day + 1721119 - $myExcelBaseDate + $excel1900isLeapYear;
         return (float)$excelDate + $excelTime;
