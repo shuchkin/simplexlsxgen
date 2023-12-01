@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.18 (2023-12-02)
+* simple linebreaks
+
 ## 1.3.17 (2023-10-02)
 * fixed [issue 128](https://github.com/shuchkin/simplexlsxgen/issues/128) date2excel type cast
 

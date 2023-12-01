@@ -88,6 +88,7 @@ $data = [
     ['Bottom + Right', '<style height="50"><bottom><right>Bottom + Right</right></bottom></style>'],
     ['<center>MERGE CELLS MERGE CELLS MERGE CELLS MERGE CELLS MERGE CELLS</center>', null],
     ['<top>Word wrap</top>', "<wraptext>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book</wraptext>"],
+    ['Linebreaks', "Line 1\nLine 2\nLine 3"]
 ];
 SimpleXLSXGen::fromArray($data)
     ->setDefaultFont('Courier New')
@@ -145,15 +146,15 @@ $xlsx->rightToLeft();
 
 // Set Meta Data Files
 // this data in propertis Files and Info file in Office 
-$xlsx->setAuthor('Sergey Shuchkin <sergey.shuchkin@gmail.com>')
-    ->setCompany('Microsoft <info@microsoft.com>')
-    ->setManager('Bill Gates <bill.gates@microsoft.com>')
-    ->setLastModifiedBy("Sergey Shuchkin <sergey.shuchkin@gmail.com>")
-    ->setTitle('This is Title')
-    ->setSubject('This is Subject')
-    ->setKeywords('Keywords1, Keywords2, Keywords3, KeywordsN')
-    ->setDescription('This is Description')
-    ->setCategory('This is Сategory')
+$xlsx->setAuthor('John Doe <john@example.com>')
+    ->setCompany('JD LLC <jd@mexample.com>')
+    ->setManager('Jane Doe <jane@example.com>')
+    ->setLastModifiedBy("John Doe <john@example.com>")
+    ->setTitle('My Books')
+    ->setSubject('My bookshelf')
+    ->setKeywords('Tolkien,Rowling,Kipling')
+    ->setDescription('Cool books worn by time')
+    ->setCategory('Books')
     ->setLanguage('en-US')
     ->setApplication('Shuchkin\SimpleXLSXGen')
 ```

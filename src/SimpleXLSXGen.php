@@ -845,6 +845,8 @@ class SimpleXLSXGen
                                 $this->extLinkId++;
                                 $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => 'mailto:' . $v, 'L' => ''];
                                 $F += self::F_HYPERLINK; // Hyperlink
+                            } elseif (strpos($v,"\n") !== false) {
+                                $A |= self::A_WRAPTEXT;
                             }
 
                             if (($N === self::N_DATE || $N === self::N_DATETIME) && $cv < 0) {
