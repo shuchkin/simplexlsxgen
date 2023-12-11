@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.19 (2023-12-11)
+* force little endian numbers in zip headers
+
 ## 1.3.18 (2023-12-02)
 * simple linebreaks
 

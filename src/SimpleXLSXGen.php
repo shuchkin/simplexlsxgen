@@ -584,16 +584,16 @@ class SimpleXLSXGen
         $e['offset'] = ftell($fh);
 
         fwrite($fh, $zipSignature);
-        fwrite($fh, pack('s', $e['vneeded'])); // version_needed
-        fwrite($fh, pack('s', $e['bitflag'])); // general_bit_flag
-        fwrite($fh, pack('s', $e['cmethod'])); // compression_method
-        fwrite($fh, pack('s', $e['modtime'])); // lastmod_time
-        fwrite($fh, pack('s', $e['moddate'])); // lastmod_date
+        fwrite($fh, pack('v', $e['vneeded'])); // version_needed
+        fwrite($fh, pack('v', $e['bitflag'])); // general_bit_flag
+        fwrite($fh, pack('v', $e['cmethod'])); // compression_method
+        fwrite($fh, pack('v', $e['modtime'])); // lastmod_time
+        fwrite($fh, pack('v', $e['moddate'])); // lastmod_date
         fwrite($fh, pack('V', $e['crc_32']));  // crc-32
         fwrite($fh, pack('I', $e['comsize'])); // compressed_size
         fwrite($fh, pack('I', $e['uncsize'])); // uncompressed_size
-        fwrite($fh, pack('s', mb_strlen($cfilename, '8bit')));   // file_name_length
-        fwrite($fh, pack('s', 0));  // extra_field_length
+        fwrite($fh, pack('v', mb_strlen($cfilename, '8bit')));   // file_name_length
+        fwrite($fh, pack('v', 0));  // extra_field_length
         fwrite($fh, $cfilename);    // file_name
         // ignoring extra_field
         fwrite($fh, $zdata);
