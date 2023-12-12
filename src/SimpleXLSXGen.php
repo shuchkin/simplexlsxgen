@@ -572,26 +572,26 @@ class SimpleXLSXGen
         $e['crc_32'] = crc32($data);
 
         // Convert date and time to DOS Format, and set then
-        $lastmod_timeS = str_pad(decbin(date('s') >= 32 ? date('s') - 32 : date('s')), 5, '0', STR_PAD_LEFT);
-        $lastmod_timeM = str_pad(decbin(date('i')), 6, '0', STR_PAD_LEFT);
-        $lastmod_timeH = str_pad(decbin(date('H')), 5, '0', STR_PAD_LEFT);
-        $lastmod_dateD = str_pad(decbin(date('d')), 5, '0', STR_PAD_LEFT);
-        $lastmod_dateM = str_pad(decbin(date('m')), 4, '0', STR_PAD_LEFT);
-        $lastmod_dateY = str_pad(decbin(date('Y') - 1980), 7, '0', STR_PAD_LEFT);
+        $date = getdate();
+        $e['dostime'] = (
+            (($date['year'] - 1980) << 25)
+            | ($date['mon'] << 21)
+            | ($date['mday'] << 16)
+            | ($date['hours'] << 11)
+            | ($date['minutes'] << 5)
+            | ($date['seconds'] >> 1)
+        );
 
-        $e['modtime'] = bindec("$lastmod_timeH$lastmod_timeM$lastmod_timeS");
-        $e['moddate'] = bindec("$lastmod_dateY$lastmod_dateM$lastmod_dateD");
         $e['offset'] = ftell($fh);
 
         fwrite($fh, $zipSignature);
         fwrite($fh, pack('v', $e['vneeded'])); // version_needed
         fwrite($fh, pack('v', $e['bitflag'])); // general_bit_flag
         fwrite($fh, pack('v', $e['cmethod'])); // compression_method
-        fwrite($fh, pack('v', $e['modtime'])); // lastmod_time
-        fwrite($fh, pack('v', $e['moddate'])); // lastmod_date
+        fwrite($fh, pack('V', $e['dostime'])); // lastmod datetime
         fwrite($fh, pack('V', $e['crc_32']));  // crc-32
-        fwrite($fh, pack('I', $e['comsize'])); // compressed_size
-        fwrite($fh, pack('I', $e['uncsize'])); // uncompressed_size
+        fwrite($fh, pack('V', $e['comsize'])); // compressed_size
+        fwrite($fh, pack('V', $e['uncsize'])); // uncompressed_size
         fwrite($fh, pack('v', mb_strlen($cfilename, '8bit')));   // file_name_length
         fwrite($fh, pack('v', 0));  // extra_field_length
         fwrite($fh, $cfilename);    // file_name
@@ -607,8 +607,7 @@ class SimpleXLSXGen
         $cdrec .= pack('v', $e['vneeded']);                     // version needed to extract
         $cdrec .= "\x0\x0";                                     // general bit flag
         $cdrec .= pack('v', $e['cmethod']);                     // compression method
-        $cdrec .= pack('v', $e['modtime']);                     // lastmod time
-        $cdrec .= pack('v', $e['moddate']);                     // lastmod date
+        $cdrec .= pack('V', $e['dostime']);                     // lastmod datetime
         $cdrec .= pack('V', $e['crc_32']);                      // crc32
         $cdrec .= pack('V', $e['comsize']);                     // compressed filesize
         $cdrec .= pack('V', $e['uncsize']);                     // uncompressed filesize
