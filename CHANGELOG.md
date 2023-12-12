@@ -1,6 +1,6 @@
 # Changelog
 
-## 1.3.19 (2023-12-11)
+## 1.3.20 (2023-12-12)
 * force little endian numbers in zip headers
 
 ## 1.3.18 (2023-12-02)
