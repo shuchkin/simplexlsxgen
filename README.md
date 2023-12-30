@@ -100,14 +100,14 @@ SimpleXLSXGen::fromArray($data)
 ![XLSX screenshot](styles.png)
 
 ### RAW Strings
-Prefix #0 cell value (use double quotes).
+Prefix #0 cell value (use double quotes) or use ::raw() method.
 ```php
 $PushkinDOB = '1799-07-06';
 $data = [
     ['Datetime as raw string', "\0".'2023-01-09 11:16:34'],
     ['Date as raw string', "\0".$PushkinDOB],
     ['Disable type detection', "\0".'+12345'],
-    ['Insert greater/less them simbols', "\0".'20- short term: <6 month'],
+    ['Insert greater/less them simbols', SimpleXLSXGen::raw('20- short term: <6 month')],
 
 ];
 SimpleXLSXGen::fromArray($data)
@@ -120,18 +120,23 @@ SimpleXLSXGen::fromArray($data)
 Shuchkin\SimpleXLSXGen::fromArray( $books )->downloadAs('table.xlsx');
 
 // Fluid interface, multiple sheets
-Shuchkin\SimpleXLSXGen::fromArray( $books )->addSheet( $books2 )->download();
+Shuchkin\SimpleXLSXGen::fromArray( $books, 'My books' )->addSheet( $books2 )->download();
 
 // Alternative interface, sheet name, get xlsx content
 $xlsx_cache = (string) (new Shuchkin\SimpleXLSXGen)->addSheet( $books, 'Modern style');
 
 // Classic interface
-use Shuchkin\SimpleXLSXGen
+use Shuchkin\SimpleXLSXGen;
 $xlsx = new SimpleXLSXGen();
 $xlsx->addSheet( $books, 'Catalog 2021' );
 $xlsx->addSheet( $books2, 'Stephen King catalog');
 $xlsx->downloadAs('books_2021.xlsx');
 exit();
+
+// Empty book with title
+$xlsx = SimpleXLSX::create('My books');
+$xlsx->addSheet( $books );
+$xlsx->save(); // ./My books.xlsx
 
 // Autofilter
 $xlsx->autoFilter('A1:B10');
