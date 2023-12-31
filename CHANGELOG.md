@@ -7,7 +7,7 @@
 * added examples SimpleXLSXGen::create, SimpleXSLXGen::raw, SimpleXLSXGen:save in README.md
 * fixed [fpassthru disabled issue](https://github.com/shuchkin/simplexlsxgen/issues/116)
 * fixed empty book, A1 empty now, text _No data_ removed
-* thx [Javier]](https://github.com/xaviermdq)
+* thx [Javier](https://github.com/xaviermdq)
 
 ## 1.3.20 (2023-12-12)
 * force little endian numbers in zip headers
