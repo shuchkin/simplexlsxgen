@@ -142,7 +142,7 @@ $xlsx->save(); // ./My books.xlsx
 $xlsx = SimpleXLSX::fromArray([
     ['internal link', '<a href="\'My books 2\'!A1">Go to second sheet</a>'],
     ['http', 'https://example.com/'], // autodetect
-    ['http + query + hash', 'https://en.wikipedia.org/wiki/Office_Open_XML#References'], // autodetect
+    ['http + hash', 'https://en.wikipedia.org/wiki/Office_Open_XML#References'], // autodetect
     ['external anchor', '<a href="https://en.wikipedia.org/wiki/Office_Open_XML#References">Open XML</a>'],
     ['relative link', '<a href="books.xlsx">books</a>'],
     ['relative link + cell addr', '<a href="..\books.xlsx#\'Sheet 2\'!A1">link to second sheet in other book</a>'],
@@ -158,7 +158,8 @@ $xlsx->autoFilter('A1:B10');
 $xlsx->freezePanes('C3');
 
 // RTL mode
-// Column A is on the far right, Column B is one column left of Column A, and so on. Also, information in cells is displayed in the Right to Left format.
+// Column A is on the far right, Column B is one column left of Column A, and so on.
+// Also, information in cells is displayed in the Right to Left format.
 $xlsx->rightToLeft();
 
 // Set Meta Data Files
