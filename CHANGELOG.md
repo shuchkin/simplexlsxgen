@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.4.11 (2024-02-07)
+* hyperlinks to local files
+* num2name static now
+
 ## 1.4.10 (2023-12-31)
 * added SimpleXLSXGen::create($title = null) to create empty book with title
 * added SimpleXLSXGen::save to save xlsx in current folder as {$title}.xslx or {$curdate}.xlsx

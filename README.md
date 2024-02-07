@@ -138,6 +138,18 @@ $xlsx = SimpleXLSX::create('My books');
 $xlsx->addSheet( $books );
 $xlsx->save(); // ./My books.xlsx
 
+// Hyperlinks
+$xlsx = SimpleXLSX::fromArray([
+    ['internal link', '<a href="\'My books 2\'!A1">Go to second sheet</a>'],
+    ['http', 'https://example.com/'], // autodetect
+    ['http + query + hash', 'https://en.wikipedia.org/wiki/Office_Open_XML#References'], // autodetect
+    ['external anchor', '<a href="https://en.wikipedia.org/wiki/Office_Open_XML#References">Open XML</a>'],
+    ['relative link', '<a href="books.xlsx">books</a>'],
+    ['relative link + cell addr', '<a href="..\books.xlsx#\'Sheet 2\'!A1">link to second sheet in other book</a>'],
+    ['mailto', 'info@example.com'], // autodetect
+    ['mailto 2', '<a href="mailto:info@example.com">Please email me</a>'],
+])->addSheet([['Second sheet']], 'My books 2')->saveAs('hyperlinks.xlsx');
+
 // Autofilter
 $xlsx->autoFilter('A1:B10');
 
