@@ -21,7 +21,7 @@ namespace Shuchkin;
  * The OOXML standard is used since MS Excel 2007 spreadsheets. The extension used is .xlsx.
  *
  * @author Sergey Shuchkin <sergey.shuchkin@gmail.com>
- * @version 1.4.10
+ * @version 1.4.11
  */
 class SimpleXLSXGen
 {
@@ -829,20 +829,20 @@ class SimpleXLSXGen
                                 if (strpos($v, '<wraptext>') !== false) {
                                     $A += self::A_WRAPTEXT;
                                 }
-                                if (preg_match('/<a href="(https?:\/\/[^"]+)">(.*?)<\/a>/i', $v, $m)) {
+                                if (preg_match('/<a href="([^"]+)">(.*?)<\/a>/i', $v, $m)) {
+                                    $F += self::F_HYPERLINK;
                                     $h = explode('#', $m[1]);
-                                    $this->extLinkId++;
-                                    $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $h[0], 'L' => isset($h[1]) ? $h[1] : ''];
-                                    $F += self::F_HYPERLINK; // Hyperlink
-                                }
-                                if (preg_match('/<a href="(mailto?:[^"]+)">(.*?)<\/a>/i', $v, $m)) {
-                                    $this->extLinkId++;
-                                    $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $m[1], 'L' => ''];
-                                    $F += self::F_HYPERLINK; // mailto hyperlink
-                                }
-                                if (preg_match('/<a href="([^"]+![^"]+)">(.*?)<\/a>/i', $v, $m)) {
-                                    $this->sheets[$idx]['hyperlinks'][] = ['ID' => null, 'R' => $cname, 'H' => null, 'L' => $m[1]];
-                                    $F += self::F_HYPERLINK; // internal hyperlink
+                                    if (count($h) === 1) {
+                                        if (strpos($h[0], '!') > 0) { // internal hyperlink
+                                            $this->sheets[$idx]['hyperlinks'][] = ['ID' => null, 'R' => $cname, 'H' => null, 'L' => $m[1]];
+                                        } else {
+                                            $this->extLinkId++;
+                                            $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $m[1], 'L' => ''];
+                                        }
+                                    } else {
+                                        $this->extLinkId++;
+                                        $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $h[0], 'L' => $h[1]];
+                                    }
                                 }
                                 if (preg_match('/<f([^>]*)>/', $v, $m)) {
                                     $cf = strip_tags($v);
@@ -900,15 +900,15 @@ class SimpleXLSXGen
                                 $N = self::N_DATETIME; // [22] m/d/yy h:mm
                             } elseif (preg_match('/^[0-9+-.]+$/', $v)) { // Long ?
                                 $A += ($A & (self::A_LEFT | self::A_CENTER)) ? 0 : self::A_RIGHT;
-                            } elseif (preg_match('/^https?:\/\/\S+$/i', $v)) {
+                            } elseif (preg_match('/^https?:\/\/\S+$/i', $v)) { // Hyperlink ?
                                 $h = explode('#', $v);
                                 $this->extLinkId++;
                                 $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $h[0], 'L' => isset($h[1]) ? $h[1] : ''];
-                                $F += self::F_HYPERLINK; // Hyperlink
-                            } elseif (preg_match("/^[a-zA-Z0-9_\.\-]+@([a-zA-Z0-9][a-zA-Z0-9\-]*\.)+[a-zA-Z]{2,}$/", $v)) {
+                                $F += self::F_HYPERLINK;
+                            } elseif (preg_match("/^[a-zA-Z0-9_\.\-]+@([a-zA-Z0-9][a-zA-Z0-9\-]*\.)+[a-zA-Z]{2,}$/", $v)) { // email?
                                 $this->extLinkId++;
                                 $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => 'mailto:' . $v, 'L' => ''];
-                                $F += self::F_HYPERLINK; // Hyperlink
+                                $F += self::F_HYPERLINK;
                             } elseif (strpos($v, "\n") !== false) {
                                 $A |= self::A_WRAPTEXT;
                             }
@@ -1035,52 +1035,6 @@ class SimpleXLSXGen
         );
     }
 
-    /**
-     * Convert column number (1, 2, ...) to column letter (A, B, ..., Z, AA, ...)
-     *
-     * @param integer $num Column number
-     *
-     * @return string Column letter(s)
-     */
-    public static function num2name($num)
-    {
-        $numeric = ($num - 1) % 26;
-        $letter = chr(65 + $numeric);
-        $num2 = (int)(($num - 1) / 26);
-        if ($num2 > 0) {
-            return self::num2name($num2) . $letter;
-        }
-        return $letter;
-    }
-
-    public static function date2excel($year, $month, $day, $hours = 0, $minutes = 0, $seconds = 0)
-    {
-        $excelTime = (($hours * 3600) + ($minutes * 60) + $seconds) / 86400;
-        $year = (int) $year;
-        $month = (int) $month;
-        $day = (int) $day;
-        if ($year === 0) {
-            return $excelTime;
-        }
-        $excel1900isLeapYear = 1;
-        if (($year === 1900) && ($month <= 2)) {
-            $excel1900isLeapYear = 0;
-        }
-        $myExcelBaseDate = 2415020;
-        // Julian base date Adjustment
-        if ($month > 2) {
-            $month -= 3;
-        } else {
-            $month += 9;
-            --$year;
-        }
-        $century = floor($year / 100);
-        $decade = $year - $century * 100;
-        // Calculate the Julian Date, then subtract the Excel base date (JD 2415020 = 31-Dec-1899 Giving Excel Date of 0)
-        $excelDate = floor((146097 * $century) / 4) + floor((1461 * $decade) / 4) + floor((153 * $month + 2) / 5) + $day + 1721119 - $myExcelBaseDate + $excel1900isLeapYear;
-        return (float)$excelDate + $excelTime;
-    }
-
     public function setDefaultFont($name)
     {
         $this->defaultFont = $name;
@@ -1169,17 +1123,17 @@ class SimpleXLSXGen
         $this->sheets[$this->curSheet]['colwidth'][$col] = $width;
         return $this;
     }
+
     public function rightToLeft($value = true)
     {
         $this->rtl = $value;
         return $this;
     }
 
-    public static function esc($str)
+    public function freezePanes($cell)
     {
-        // XML UTF-8: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-        // but we use fast version
-        return str_replace(['&', '<', '>', "\x00", "\x03", "\x0B"], ['&amp;', '&lt;', '&gt;', '', '', ''], $str);
+        $this->sheets[$this->curSheet]['frozen'] = $cell;
+        return $this;
     }
 
     public function getNumFmtId($code)
@@ -1194,6 +1148,62 @@ class SimpleXLSXGen
         $this->NF[$id] = $code;
         $this->NF_KEYS[$code] = $id;
         return $id;
+    }
+
+    /**
+     * Convert column number (1, 2, ...) to column letter (A, B, ..., Z, AA, ...)
+     *
+     * @param integer $num Column number
+     *
+     * @return string Column letter(s)
+     */
+    public static function num2name($num)
+    {
+        $numeric = ($num - 1) % 26;
+        $letter = chr(65 + $numeric);
+        $num2 = (int)(($num - 1) / 26);
+        if ($num2 > 0) {
+            return self::num2name($num2) . $letter;
+        }
+        return $letter;
+    }
+
+    public static function date2excel($year, $month, $day, $hours = 0, $minutes = 0, $seconds = 0)
+    {
+        $excelTime = (($hours * 3600) + ($minutes * 60) + $seconds) / 86400;
+        $year = (int) $year;
+        $month = (int) $month;
+        $day = (int) $day;
+        // echo "y=$year m=$month d=$day h=$hours m=$minutes s=$seconds".PHP_EOL;
+        if ($year === 0) {
+            return $excelTime;
+        }
+        // self::CALENDAR_WINDOWS_1900
+        $excel1900isLeapYear = 1;
+        if (($year === 1900) && ($month <= 2)) {
+            $excel1900isLeapYear = 0;
+        }
+        $myExcelBaseDate = 2415020;
+        // Julian base date Adjustment
+        if ($month > 2) {
+            $month -= 3;
+        } else {
+            $month += 9;
+            --$year;
+        }
+        $century = floor($year / 100);
+        $decade = $year - $century * 100;
+        // echo "y=$year m=$month d=$day cent=$century dec=$decade h=$hours m=$minutes s=$seconds".PHP_EOL;
+        // Calculate the Julian Date, then subtract the Excel base date (JD 2415020 = 31-Dec-1899 Giving Excel Date of 0)
+        $excelDate = floor((146097 * $century) / 4) + floor((1461 * $decade) / 4) + floor((153 * $month + 2) / 5) + $day + 1721119 - $myExcelBaseDate + $excel1900isLeapYear;
+        return (float)$excelDate + $excelTime;
+    }
+
+    public static function esc($str)
+    {
+        // XML UTF-8: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+        // but we use fast version
+        return str_replace(['&', '<', '>', "\x00", "\x03", "\x0B"], ['&amp;', '&lt;', '&gt;', '', '', ''], $str);
     }
 
     public static function raw($value)
@@ -1256,12 +1266,6 @@ class SimpleXLSXGen
             $c = chr(ord('A') + $i % 26) . $c;
         }
         return $c . strval($y);
-    }
-
-    public function freezePanes($cell)
-    {
-        $this->sheets[$this->curSheet]['frozen'] = $cell;
-        return $this;
     }
 
 }
