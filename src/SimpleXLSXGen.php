@@ -1181,27 +1181,14 @@ class SimpleXLSXGen
     public static function cell2coord($cell, &$x, &$y)
     {
         $x = $y = 0;
-        $lettercount = 0;
-        $cell = str_replace([' ', '\t', '\r', '\n', '\v', '\0'], '', $cell);
-        if (empty($cell)) {
-            return;
-        }
-        $cell = strtoupper($cell);
-        for ($i = 0, $len = strlen($cell); $i < $len; $i++) {
-            if ($cell[$i] >= 'A' && $cell[$i] <= 'Z') {
-                $lettercount++;
+        if (preg_match('/^([A-Z]+)(\d+)$/', $cell, $m)) {
+            $len = strlen($m[1]);
+            for ($i = 0; $i < $len; $i++) {
+                $int = ord($m[1][$i]) - 65; // A -> 0, B -> 1
+                $int += ($i === $len - 1) ? 0 : 1;
+                $x += $int * pow(26, $len-$i-1);
             }
-        }
-        if ($lettercount > 0) {
-            $x = ord($cell[$lettercount - 1]) - ord('A');
-            $e = 1;
-            for ($i = $lettercount - 2; $i >= 0; $i--) {
-                $x += (ord($cell[$i]) - ord('A') + 1) * pow(26, $e);
-                $e++;
-            }
-        }
-        if ($lettercount < strlen($cell)) {
-            $y = ((int)substr($cell, $lettercount)) - 1;
+            $y = ((int)$m[2]) - 1;
         }
     }
 
@@ -1209,7 +1196,7 @@ class SimpleXLSXGen
     {
         $c = '';
         for ($i = $x; $i >= 0; $i = ((int)($i / 26)) - 1) {
-            $c = chr(ord('A') + $i % 26) . $c;
+            $c = chr(65 + $i % 26) . $c;
         }
         return $c . ($y + 1);
     }
