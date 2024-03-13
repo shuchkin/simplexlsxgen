@@ -719,7 +719,7 @@ class SimpleXLSXGen
                     if (!isset($COL[$CUR_COL])) {
                         $COL[$CUR_COL] = 0;
                     }
-                    $cname = self::num2name($CUR_COL) . $CUR_ROW;
+                    $cname = self::coord2cell($CUR_COL-1) . $CUR_ROW;
                     if ($v === null || $v === '') {
                         $row .= '<c r="' . $cname . '"/>';
                         continue;
@@ -956,7 +956,7 @@ class SimpleXLSXGen
             }
             $COLS[] = '</cols>';
             $ROWS[] = '</sheetData>';
-            $REF = 'A1:' . self::num2name(count($COL)) . $CUR_ROW;
+            $REF = 'A1:' . self::coord2cell(count($COL)-1) . $CUR_ROW;
         } else {
             $ROWS[] = '<sheetData/>';
             $REF = 'A1:A1';
@@ -1121,17 +1121,6 @@ class SimpleXLSXGen
         return $id;
     }
 
-    public static function num2name($num)
-    {
-        $numeric = ($num - 1) % 26;
-        $letter = chr(65 + $numeric);
-        $num2 = (int)(($num - 1) / 26);
-        if ($num2 > 0) {
-            return self::num2name($num2) . $letter;
-        }
-        return $letter;
-    }
-
     public static function date2excel($year, $month, $day, $hours = 0, $minutes = 0, $seconds = 0)
     {
         $excelTime = (($hours * 3600) + ($minutes * 60) + $seconds) / 86400;
@@ -1192,13 +1181,13 @@ class SimpleXLSXGen
         }
     }
 
-    public static function coord2cell($x, $y)
+    public static function coord2cell($x, $y = null)
     {
         $c = '';
         for ($i = $x; $i >= 0; $i = ((int)($i / 26)) - 1) {
             $c = chr(65 + $i % 26) . $c;
         }
-        return $c . ($y + 1);
+        return $c . ($y === null ? '' : ($y + 1));
     }
 
 }
