@@ -1,20 +1,21 @@
 <?php
 
+/** @noinspection UnknownInspectionInspection */
+/* PHP5.6 */
+/** @noinspection PowerOperatorCanBeUsedInspection */
+/* PHP7 */
+/** @noinspection NullCoalescingOperatorCanBeUsedInspection */
+/** @noinspection PhpIssetCanBeReplacedWithCoalesceInspection */
+/* PHP8 */
+/** @noinspection ReturnTypeCanBeDeclaredInspection */
+/** @noinspection PhpMissingClassConstantTypeInspection */
 /** @noinspection PhpMissingFieldTypeInspection */
 /** @noinspection PhpMissingParamTypeInspection */
 /** @noinspection PhpMissingReturnTypeInspection */
-/** @noinspection PhpMissingClassConstantTypeInspection */
-
-/** @noinspection UnknownInspectionInspection */
-/** @noinspection ReturnTypeCanBeDeclaredInspection */
-/** @noinspection NullCoalescingOperatorCanBeUsedInspection */
-/** @noinspection PhpIssetCanBeReplacedWithCoalesceInspection */
-/** @noinspection PowerOperatorCanBeUsedInspection */
 /** @noinspection PhpStrFunctionsInspection */
 /** @noinspection AccessModifierPresentedInspection */
 
 namespace Shuchkin;
-
 /**
  * Class SimpleXLSXGen
  * Export data to MS Excel. PHP XLSX generator
