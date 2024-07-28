@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.4.12 (2024-07-28)
+* tag ```<raw>``` for styled raw values
+
 ## 1.4.11 (2024-02-07)
 * hyperlinks to local files
 * num2name static now

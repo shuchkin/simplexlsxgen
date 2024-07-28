@@ -726,7 +726,7 @@ class SimpleXLSXGen
                         continue;
                     }
                     $ct = $cv = $cf = null;
-                    $N = $A = $F = $FL = $C = $BG = $FS = 0;
+                    $N = $A = $F = $FL = $C = $BG = $FS = $FR = 0;
                     $BR = '';
                     if (is_string($v)) {
                         if ($v[0] === "\0") { // RAW value as string
@@ -814,8 +814,11 @@ class SimpleXLSXGen
                                         $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $h[0], 'L' => $h[1]];
                                     }
                                 }
-
-                                if (preg_match('/<f([^>]*)>/', $v, $m)) {
+                                // formatted raw?
+                                if (preg_match('/<raw>(.*)<\/raw>/', $v, $m)) {
+                                    $FR = 1;
+                                    $v = $m[1];
+                                } elseif (preg_match('/<f([^>]*)>/', $v, $m)) {
                                     $cf = strip_tags($v);
                                     $v = 'formula';
                                     if (preg_match('/ v="([^"]+)"/', $m[1], $m2)) {
@@ -824,9 +827,12 @@ class SimpleXLSXGen
                                 } else {
                                     $v = strip_tags($v);
                                 }
-                            } // tags
+                            } // \tags
                             $vl = mb_strlen($v);
-                            if ($N) {
+                            if ($FR) {
+                                $v = htmlspecialchars_decode($v);
+                                $vl = mb_strlen($v);
+                            } elseif ($N) {
                                 $cv = ltrim($v, '+');
                             } elseif ($v === '0' || preg_match('/^[-+]?[1-9]\d{0,14}$/', $v)) { // Integer as General
                                 $cv = ltrim($v, '+');

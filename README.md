@@ -54,7 +54,8 @@ $data = [
     ['Hyperlink', 'https://github.com/shuchkin/simplexlsxgen'],
     ['Hyperlink + Anchor', '<a href="https://github.com/shuchkin/simplexlsxgen">SimpleXLSXGen</a>'],
     ['Internal link', '<a href="sheet2!A1">Go to second page</a>'],
-    ['RAW string', "\0" . '2020-10-04 16:02:00']
+    ['RAW string', "\0" . '2020-10-04 16:02:00'],
+    ['Formatted RAW string', '<b><i><raw>2024-07-28 16:02:00</raw></i></b>'],
 ];
 SimpleXLSXGen::fromArray($data)->saveAs('datatypes.xlsx');
 ```
@@ -100,7 +101,7 @@ SimpleXLSXGen::fromArray($data)
 ![XLSX screenshot](styles.png)
 
 ### RAW Strings
-Prefix #0 cell value (use double quotes) or use ::raw() method.
+Prefix #0 cell value (use double quotes) or use ::raw() method, or tag ```<raw>```
 ```php
 $PushkinDOB = '1799-07-06';
 $data = [
@@ -108,12 +109,11 @@ $data = [
     ['Date as raw string', "\0".$PushkinDOB],
     ['Disable type detection', "\0".'+12345'],
     ['Insert greater/less them simbols', SimpleXLSXGen::raw('20- short term: <6 month')],
-
+    ['Formatted raw', '<b><center><raw>+123456 &lt;tag&gt;<tag2></raw></center></b>'],
 ];
 SimpleXLSXGen::fromArray($data)
     ->saveAs('test_rawstrings.xlsx');
 ```
-
 ### More examples
 ```php
 // Fluid interface, output to browser for download
