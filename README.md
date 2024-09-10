@@ -6,7 +6,7 @@ Export data to Excel XLSX file. PHP XLSX generator. No external tools and librar
 - XLS reader [here](https://github.com/shuchkin/simplexls)
 - CSV reader/writer [here](https://github.com/shuchkin/simplecsv)
 
-**Sergey Shuchkin** <sergey.shuchkin@gmail.com> 2020-2023<br/>
+**Sergey Shuchkin** <sergey.shuchkin@gmail.com> 2020-2024<br/>
 
 *Hey, bro, please ★ the package for my motivation :) and [donate](https://opencollective.com/simplexlsx) for more motivation!* 
 
