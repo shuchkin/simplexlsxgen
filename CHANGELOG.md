@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.4.13 (2024-10-13)
+* fixed [formula and style](https://github.com/shuchkin/simplexlsxgen/issues/156) issue, when skpped `v="value"` in formula tag 
+ 
 ## 1.4.12 (2024-07-28)
 * tag ```<raw>``` for styled raw values
 
@@ -9,7 +12,7 @@
 
 ## 1.4.10 (2023-12-31)
 * added SimpleXLSXGen::create($title = null) to create empty book with title
-* added SimpleXLSXGen::save to save xlsx in current folder as {$title}.xslx or {$curdate}.xlsx
+* added SimpleXLSXGen::save to save xlsx in current folder as `title`.xslx or `curdate`.xlsx
 * SimpleXLSXGen::esc and SimpleXLSXGen::date2excel static now
 * added examples SimpleXLSXGen::create, SimpleXSLXGen::raw, SimpleXLSXGen:save in README.md
 * fixed [fpassthru disabled issue](https://github.com/shuchkin/simplexlsxgen/issues/116)

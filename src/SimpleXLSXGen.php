@@ -820,7 +820,7 @@ class SimpleXLSXGen
                                     $v = $m[1];
                                 } elseif (preg_match('/<f([^>]*)>/', $v, $m)) {
                                     $cf = strip_tags($v);
-                                    $v = 'formula';
+                                    $v = 0;
                                     if (preg_match('/ v="([^"]+)"/', $m[1], $m2)) {
                                         $v = $m2[1];
                                     }
