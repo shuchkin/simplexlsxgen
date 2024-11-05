@@ -155,7 +155,7 @@ $xlsx->autoFilter('A1:B10');
 
 // Freeze rows and columns from top-left corner up to, but not including,
 // the row and column of the indicated cell
-$xlsx->freezePanes('B2'); // B1 - first column, A2 - top row
+$xlsx->freezePanes('B2'); // B1 - freeze first column, A2 - freeze top row
 
 // RTL mode
 // Column A is on the far right, Column B is one column left of Column A, and so on.
