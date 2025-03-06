@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.4.14 (2025-10-13)
+* fixed [empty cells and selection](https://github.com/shuchkin/simplexlsxgen/issues/164) issue, thx [denisboccardo](https://github.com/denisboccardo)
+
 # 1.4.13 (2024-10-13)
 * fixed [formula and style](https://github.com/shuchkin/simplexlsxgen/issues/156) issue, when skpped `v="value"` in formula tag 
  

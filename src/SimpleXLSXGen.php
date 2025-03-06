@@ -707,7 +707,6 @@ class SimpleXLSXGen
                 $SHEETVIEWS .= $PANE ? ">\r\n" . $PANE . "\r\n</sheetView>" : ' />';
                 $SHEETVIEWS .= "\r\n</sheetViews>";
             }
-            $COLS[] = '<cols>';
             $CUR_ROW = 0;
             $COL = [];
             foreach ($this->sheets[$idx]['rows'] as $r) {
@@ -896,11 +895,13 @@ class SimpleXLSXGen
                             }
 
                         }
-                        if ($cv === null) {
+                        if ($cv === null) { // string
                             $v = self::esc($v);
                             if ($cf) {
                                 $ct = 'str';
                                 $cv = $v;
+                            } elseif ($v === '') {
+                                $ct = 's';
                             } elseif (mb_strlen($v) > 160) {
                                 $ct = 'inlineStr';
                                 $cv = $v;
@@ -951,17 +952,30 @@ class SimpleXLSXGen
                             $this->XF[] = [$N, $A, $F, $FL, $C, $BG, $BR, $FS];
                         }
                     }
-                    $row .= '<c r="' . $cname . '"' . ($ct ? ' t="' . $ct . '"' : '') . ($cs ? ' s="' . $cs . '"' : '') . '>'
+                    $row .= '<c r="' . $cname . '"' . ($ct ? ' t="' . $ct . '"' : '') . ($cs ? ' s="' . $cs . '"' : '');
+                    if ($ct === 's' && $cv === null) {
+                        $row .= '/>';
+                    } else {
+                        $row .= '>'
                         . ($cf ? '<f>' . $cf . '</f>' : '')
-                        . ($ct === 'inlineStr' ? '<is><t>' . $cv . '</t></is>' : '<v>' . $cv . '</v>') . "</c>\r\n";
+                        . ($ct === 'inlineStr' ? '<is><t>' . $cv . '</t></is>' : '<v>' . $cv . '</v>')
+                        . "</c>\r\n";
+                    }
                 }
                 $ROWS[] = '<row r="' . $CUR_ROW . '"' . ($RH ? ' customHeight="1" ht="' . $RH . '"' : '') . '>' . $row . "</row>";
             }
+            $COLS[] = '<cols>';
             foreach ($COL as $k => $max) {
+                if ($max === 0) {
+                    continue;
+                }
                 $w = isset($this->sheets[$idx]['colwidth'][$k]) ? $this->sheets[$idx]['colwidth'][$k] : min($max + 1, 60);
                 $COLS[] = '<col min="' . $k . '" max="' . $k . '" width="' . $w . '" customWidth="1" />';
             }
             $COLS[] = '</cols>';
+            if (count($COLS) === 2) {
+                $COLS = [];
+            }
             $ROWS[] = '</sheetData>';
             $REF = 'A1:' . self::coord2cell(count($COL)-1) . $CUR_ROW;
         } else {
