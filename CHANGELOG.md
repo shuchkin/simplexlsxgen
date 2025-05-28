@@ -1,6 +1,9 @@
 # Changelog
 
-# 1.4.14 (2025-10-13)
+# 1.4.15 (2025-05-28)
+* Make custom dateformats [via nf= work](https://github.com/shuchkin/simplexlsxgen/pull/166), thx [scravy](https://github.com/scravy)  
+
+# 1.4.14 (2025-03-07)
 * fixed [empty cells and selection](https://github.com/shuchkin/simplexlsxgen/issues/164) issue, thx [denisboccardo](https://github.com/denisboccardo)
 
 # 1.4.13 (2024-10-13)
