@@ -60,6 +60,7 @@ class SimpleXLSXGen
     const N_DOLLAR = 165;
     const N_EURO = 166;
     const N_DATETIME = 22; // m/d/yy h:mm
+    const N_CUSTOM = 197;
     const F_NORMAL = 0;
     const F_HYPERLINK = 1;
     const F_BOLD = 2;
@@ -725,7 +726,7 @@ class SimpleXLSXGen
                         continue;
                     }
                     $ct = $cv = $cf = null;
-                    $N = $A = $F = $FL = $C = $BG = $FS = $FR = 0;
+                    $N = $NF = $A = $F = $FL = $C = $BG = $FS = $FR = 0;
                     $BR = '';
                     if (is_string($v)) {
                         if ($v[0] === "\0") { // RAW value as string
@@ -761,7 +762,7 @@ class SimpleXLSXGen
                                     }
                                     if (preg_match('/ nf="([^"]+)"/', $m[1], $m2)) {
                                         $c = htmlspecialchars_decode($m2[1], ENT_QUOTES);
-                                        $N = $this->getNumFmtId($c);
+                                        $NF = $this->getNumFmtId($c);
                                     }
                                     if (preg_match('/ border="([^"]+)"/', $m[1], $m2)) {
                                         $b = htmlspecialchars_decode($m2[1], ENT_QUOTES);
@@ -931,6 +932,9 @@ class SimpleXLSXGen
                         $N = self::N_DATETIME; // [22] m/d/yy h:mm
                     } else {
                         continue;
+                    }
+                    if ($NF) {
+                        $N = $NF;
                     }
                     $COL[$CUR_COL] = max($vl, $COL[$CUR_COL]);
                     $cs = 0;
@@ -1136,7 +1140,7 @@ class SimpleXLSXGen
         if (isset($this->NF_KEYS[$code])) {
             return $this->NF_KEYS[$code];
         }
-        $id = 197 + count($this->NF); // custom
+        $id = self::N_CUSTOM + count($this->NF); // custom
         $this->NF[$id] = $code;
         $this->NF_KEYS[$code] = $id;
         return $id;
