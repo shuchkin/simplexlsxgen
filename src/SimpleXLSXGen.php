@@ -36,7 +36,7 @@ class SimpleXLSXGen
     protected $BR_STYLE;
     protected $SI; // shared strings
     protected $SI_KEYS;
-    protected $extLinkId;
+    protected $rIndex;
 
     protected $title;
     protected $subject;
@@ -118,7 +118,6 @@ class SimpleXLSXGen
         $this->defaultFontSize = 10;
         $this->rtl = false;
         $this->sheets = [];
-        $this->extLinkId = 0;
         $this->SI = [];        // sharedStrings index
         $this->SI_KEYS = []; //  & keys
 
@@ -185,11 +184,20 @@ class SimpleXLSXGen
                 .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'
                 ."\r\n{RELS}\r\n</Relationships>",
             'xl/worksheets/sheet1.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
-                .'<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'."\r\n"
+                . '<worksheet' . "\r\n"
+                . ' xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"' . "\r\n"
+                . ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"'."\r\n"
+                . ' xmlns:mx="http://schemas.microsoft.com/office/mac/excel/2008/main"' . "\r\n"
+                . ' xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"' . "\r\n"
+                . ' xmlns:mv="urn:schemas-microsoft-com:mac:vml"' . "\r\n"
+                . ' xmlns:x14="http://schemas.microsoft.com/office/spreadsheetml/2009/9/main"' . "\r\n"
+                . ' xmlns:x15="http://schemas.microsoft.com/office/spreadsheetml/2010/11/main"' . "\r\n"
+                . ' xmlns:x14ac="http://schemas.microsoft.com/office/spreadsheetml/2009/9/ac"' . "\r\n"
+                . ' xmlns:xm="http://schemas.microsoft.com/office/excel/2006/main">' . "\r\n"
                 .'<dimension ref="{REF}"/>'."\r\n"
-                ."{SHEETVIEWS}\r\n{COLS}\r\n{ROWS}\r\n{AUTOFILTER}{MERGECELLS}{HYPERLINKS}</worksheet>",
+                ."{SHEETVIEWS}\r\n{COLS}\r\n{ROWS}\r\n{AUTOFILTER}{MERGECELLS}{HYPERLINKS}{VML}</worksheet>",
             'xl/worksheets/_rels/sheet1.xml.rels' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
-                .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{HYPERLINKS}</Relationships>',
+                .'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">{RELS}</Relationships>',
             'xl/sharedStrings.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
                 .'<sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="{CNT}" uniqueCount="{CNT}">{STRINGS}</sst>',
             'xl/styles.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
@@ -201,12 +209,24 @@ class SimpleXLSXGen
             'xl/workbook.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
                 .'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">'."\r\n"
                 .'<fileVersion appName="{APP}"/><sheets>{SHEETS}</sheets></workbook>',
+            'xl/comments1.xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
+                . '<comments' . "\r\n"
+                . ' xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"' . "\r\n"
+                . ' xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' . "\r\n"
+                . '<authors>{AUTHORS}</authors>' . "\r\n"
+                . '<commentList>{COMMENTS}</commentList>' . "\r\n"
+                . '</comments>',
+            'xl/drawings/vmlDrawing1.vml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' . "\r\n"
+                . '<xml xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oa="urn:schemas-microsoft-com:office:activation" xmlns:x="urn:schemas-microsoft-com:office:excel">' . "\r\n"
+                .'<o:shapelayout v:ext="edit"><o:idmap data="1" v:ext="edit"/></o:shapelayout>' . "\r\n"
+                .'<v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202.0" path="m,l,21600r21600,l21600,xe"><v:stroke joinstyle="miter"/><v:path o:connecttype="rect" gradientshapeok="t"/></v:shapetype>{SHAPES}</xml>',
             '[Content_Types].xml' => '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'."\r\n"
                 .'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">'."\r\n"
-                .'<Override PartName="/rels/.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'."\r\n"
+                .'<Default Extension="vml" ContentType="application/vnd.openxmlformats-officedocument.vmlDrawing"/>' . "\r\n"
+                .'<Default Extension="xml" ContentType="application/xml"/>' . "\r\n"
+                .'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' . "\r\n"
                 .'<Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/>'."\r\n"
                 .'<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/>'."\r\n"
-                .'<Override PartName="/xl/_rels/workbook.xml.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'."\r\n"
                 .'<Override PartName="/xl/sharedStrings.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sharedStrings+xml"/>'."\r\n"
                 .'<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>
 <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>'
@@ -256,7 +276,7 @@ class SimpleXLSXGen
                 }
             }
         }
-        $this->sheets[$this->curSheet] = ['name' => $name, 'hyperlinks' => [], 'mergecells' => [], 'colwidth' => [], 'autofilter' => '', 'frozen' => ''];
+        $this->sheets[$this->curSheet] = ['name' => $name, 'relidx' => 0, 'hyperlinks' => [], 'comments' => [], 'mergecells' => [], 'colwidth' => [], 'autofilter' => '', 'frozen' => ''];
         if (isset($rows[0]) && is_array($rows[0])) {
             $this->sheets[$this->curSheet]['rows'] = $rows;
         } else {
@@ -402,26 +422,95 @@ class SimpleXLSXGen
                 $xml = null;
             } elseif ($cfilename === 'xl/worksheets/_rels/sheet1.xml.rels') {
                 foreach ($this->sheets as $k => $v) {
-                    if ($this->extLinkId) {
-                        $RH = [];
-                        $filename = 'xl/worksheets/_rels/sheet' . ($k + 1) . '.xml.rels';
-                        foreach ($v['hyperlinks'] as $h) {
-                            if ($h['ID']) {
-                                $RH[] = '<Relationship Id="' . $h['ID'] . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="' . self::esc($h['H']) . '" TargetMode="External"/>';
-                            }
+                    $R = [];
+                    if (count($v['comments'])) {
+                        $this->sheets[$k]['relidx']++;
+                        $R[] = '<Relationship Id="rId' . $this->sheets[$k]['relidx'] . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="../comments' . ($k + 1) . '.xml"/>';
+                        $R[] = '<Relationship Id="rVMLCom" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/vmlDrawing" Target="../drawings/vmlDrawing' . ($k + 1) . '.vml"/>';
+                    }
+                    foreach ($v['hyperlinks'] as $h) {
+                        if ($h['ID']) {
+                            $R[] = '<Relationship Id="' . $h['ID'] . '" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink" Target="' . self::esc($h['H']) . '" TargetMode="External"/>';
                         }
-                        $xml = str_replace('{HYPERLINKS}', implode("\r\n", $RH), $template);
+                    }
+                    if (count($R)) {
+                        $filename = 'xl/worksheets/_rels/sheet' . ($k + 1) . '.xml.rels';
+                        $xml = str_replace('{RELS}', implode("\r\n", $R), $template);
+                        $this->_writeEntry($fh, $cdrec, $filename, $xml);
+                        $entries++;
+                    }
+                }
+                $xml = null;
+            } elseif ($cfilename === 'xl/comments1.xml') {
+                foreach ($this->sheets as $k => $v) {
+                    $C = [];
+                    $A = [];
+                    foreach ($v['comments'] as $com) {
+                        $A[$com['A']] = count($A);
+                    }
+                    foreach ($v['comments'] as $com) {
+                        $C[] = '<comment ref="' . $com['N'] . '" authorId="' . $A[$com['A']] . '"><text>' . "\r\n"
+                              . ($com['A'] ? ('<r><rPr><b/><sz val="10"/><family val="2"/></rPr><t xml:space="preserve">' . $com['A']  . ":\r\n" .'</t></r>' . "\r\n") : '')
+                            .'<r><rPr><sz val="10"/><family val="2"/></rPr><t xml:space="preserve">' . self::esc($com['T']) . '</t></r>' . "\r\n"
+//                            .'<t xml:space="preserve">' . self::esc($com['T']) . ($com['A'] ? "\r\n\t-" . $com['A'] : '') . '</t>' . "\r\n"
+                            . '</text></comment>';
+                    }
+                    if (count($C)) {
+                        $filename = 'xl/comments' . ($k + 1) . '.xml';
+                        $xml = str_replace(
+                            array('{AUTHORS}', '{COMMENTS}'),
+                            array('<author>' . implode("</author>\r\n<author>", array_keys($A)) . '</author>',
+                                implode("\r\n", $C)), $template
+                        );
+                        $this->_writeEntry($fh, $cdrec, $filename, $xml);
+                        $entries++;
+                    }
+                }
+                $xml = null;
+            } elseif ($cfilename === 'xl/drawings/vmlDrawing1.vml') {
+                foreach ($this->sheets as $k => $v) {
+                    if (count($v['comments'])) {
+                        $S = [];
+                        foreach ($v['comments'] as $k2 => $com) {
+// Anchor: LeftColumn, LeftOffset, TopRow, TopOffset, RightColumn, RightOffset, BottomRow, BottomOffset
+                            $a = [
+                                $com['C'],
+                                15,
+                                $com['R'],
+                                10,
+                                $com['C'] + 4,
+                                15,
+                                $com['R'] + 4,
+                                4
+                            ];
+                            $S[] = '<v:shape id="_x0000_s' . (1025 + $k2) .'"'
+                         . ' style="visibility:hidden" fillcolor="#ffffe1" type="#_x0000_t202">' . "\r\n"
+                         . '  <v:fill angle="0" color2="#ffffe1"/>' . "\r\n"
+                         . '  <v:shadow color="black" obscured="t" on="t"/>' . "\r\n"
+                         . '  <v:path o:connecttype="none"/><v:textbox/>' . "\r\n"
+                         . '  <x:ClientData ObjectType="Note">' . "\r\n"
+                         . '    <x:MoveWithCells/>' . "\r\n"
+                         . '    <x:SizeWithCells/>' . "\r\n"
+                         . '    <x:Anchor>' . implode(', ', $a) .'</x:Anchor>' . "\r\n"
+                         . '    <x:AutoFill>False</x:AutoFill>' . "\r\n"
+                         . '    <x:Row>' . ($com['R'] - 1) . '</x:Row>' . "\r\n"
+                         . '    <x:Column>' . ($com['C'] - 1) . '</x:Column>' . "\r\n"
+                         . '  </x:ClientData>' . "\r\n"
+                         . '</v:shape>';
+                        }
+                        $filename = 'xl/drawings/vmlDrawing' . ($k + 1) . '.vml';
+                        $xml = str_replace('{SHAPES}', "\r\n" . implode("\r\n", $S) . "\r\n", $template);
                         $this->_writeEntry($fh, $cdrec, $filename, $xml);
                         $entries++;
                     }
                 }
                 $xml = null;
             } elseif ($cfilename === '[Content_Types].xml') {
-                $TYPES = ['<Override PartName="/_rels/.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>'];
+                $TYPES = [];
                 foreach ($this->sheets as $k => $v) {
                     $TYPES[] = '<Override PartName="/xl/worksheets/sheet' . ($k + 1) . '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>';
-                    if ($this->extLinkId) {
-                        $TYPES[] = '<Override PartName="/xl/worksheets/_rels/sheet' . ($k + 1) . '.xml.rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>';
+                    if (count($v['comments'])) {
+                        $TYPES[] = '<Override PartName="/xl/comments' . ($k + 1). '.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.comments+xml" />';
                     }
                 }
                 $template = str_replace('{TYPES}', implode("\r\n", $TYPES), $template);
@@ -663,6 +752,7 @@ class SimpleXLSXGen
         setlocale(LC_NUMERIC, 'C');
         $COLS = [];
         $ROWS = [];
+        $VML = [];
         //        $SHEETVIEWS = '<sheetViews><sheetView tabSelected="1" workbookViewId="0"'.($this->rtl ? ' rightToLeft="1"' : '').'>';
         $SHEETVIEWS = '';
         $PANE = '';
@@ -734,6 +824,17 @@ class SimpleXLSXGen
                             $vl = mb_strlen($v);
                         } else {
                             if (strpos($v, '<') !== false) { // tags?
+                                if (preg_match('/<!--(.*?)-->/s', $v, $m)) {
+                                    $com = trim($m[1]);
+                                    $a = $this->author;
+                                    if (preg_match('/^([^:]+): (.*)$/us', $com, $m2)) {
+                                        $a = $m2[1];
+                                        /** @noinspection MultiAssignmentUsageInspection */
+                                        $com = $m2[2];
+                                    }
+                                    $this->sheets[$idx]['comments'][] = ['C' => $CUR_COL, 'R' => $CUR_ROW, 'N' => $cname, 'T' => $com, 'A' => $a];
+                                    $v = str_replace($m[0], '', $v);
+                                }
                                 if (strpos($v, '<b>') !== false) {
                                     $F += self::F_BOLD;
                                 }
@@ -806,12 +907,12 @@ class SimpleXLSXGen
                                         if (strpos($h[0], '!') > 0) { // internal hyperlink
                                             $this->sheets[$idx]['hyperlinks'][] = ['ID' => null, 'R' => $cname, 'H' => null, 'L' => $m[1]];
                                         } else {
-                                            $this->extLinkId++;
-                                            $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $m[1], 'L' => ''];
+                                            $this->sheets[$idx]['relidx']++;
+                                            $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->sheets[$idx]['relidx'], 'R' => $cname, 'H' => $m[1], 'L' => ''];
                                         }
                                     } else {
-                                        $this->extLinkId++;
-                                        $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $h[0], 'L' => $h[1]];
+                                        $this->sheets[$idx]['relidx']++;
+                                        $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->sheets[$idx]['relidx'], 'R' => $cname, 'H' => $h[0], 'L' => $h[1]];
                                     }
                                 }
                                 // formatted raw?
@@ -879,12 +980,12 @@ class SimpleXLSXGen
                                 $A += ($A & (self::A_LEFT | self::A_CENTER)) ? 0 : self::A_RIGHT;
                             } elseif (preg_match('/^https?:\/\/\S+$/i', $v)) { // Hyperlink ?
                                 $h = explode('#', $v);
-                                $this->extLinkId++;
-                                $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => $h[0], 'L' => isset($h[1]) ? $h[1] : ''];
+                                $this->sheets[$idx]['relidx']++;
+                                $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->sheets[$idx]['relidx'], 'R' => $cname, 'H' => $h[0], 'L' => isset($h[1]) ? $h[1] : ''];
                                 $F += self::F_HYPERLINK;
                             } elseif (preg_match("/^[a-zA-Z0-9_\.\-]+@([a-zA-Z0-9][a-zA-Z0-9\-]*\.)+[a-zA-Z]{2,}$/", $v)) { // email?
-                                $this->extLinkId++;
-                                $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->extLinkId, 'R' => $cname, 'H' => 'mailto:' . $v, 'L' => ''];
+                                $this->sheets[$idx]['relidx']++;
+                                $this->sheets[$idx]['hyperlinks'][] = ['ID' => 'rId' . $this->sheets[$idx]['relidx'], 'R' => $cname, 'H' => 'mailto:' . $v, 'L' => ''];
                                 $F += self::F_HYPERLINK;
                             } elseif (strpos($v,"\n") !== false) {
                                 $A |= self::A_WRAPTEXT;
@@ -1010,12 +1111,16 @@ class SimpleXLSXGen
             }
             $HYPERLINKS[] = '</hyperlinks>';
         }
+        if (count($this->sheets[$idx]['comments'])) {
+
+            $VML[] = '<legacyDrawing r:id="rVMLCom" />';
+        }
 
         //restore locale
         setlocale(LC_NUMERIC, $_loc);
 
         return str_replace(
-            ['{REF}', '{COLS}', '{ROWS}', '{AUTOFILTER}', '{MERGECELLS}', '{HYPERLINKS}', '{SHEETVIEWS}'],
+            ['{REF}', '{COLS}', '{ROWS}', '{AUTOFILTER}', '{MERGECELLS}', '{HYPERLINKS}', '{SHEETVIEWS}', '{VML}'],
             [
                 $REF,
                 implode("\r\n", $COLS),
@@ -1023,7 +1128,8 @@ class SimpleXLSXGen
                 $AUTOFILTER,
                 implode("\r\n", $MERGECELLS),
                 implode("\r\n", $HYPERLINKS),
-                $SHEETVIEWS
+                $SHEETVIEWS,
+                implode("\r\n", $VML)
             ],
             $template
         );
