@@ -1,5 +1,9 @@
 # Changelog
 
+# 1.5.11 (2025-08-09)
+* added ::rawArray()
+
+
 # 1.5.10 (2025-07-08)
 * added cell comments
 

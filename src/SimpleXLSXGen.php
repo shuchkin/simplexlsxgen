@@ -1297,6 +1297,15 @@ class SimpleXLSXGen
     {
         return "\0" . $value;
     }
+    public static function rawArray($array)
+    {
+        foreach ($array as &$row) {
+            foreach ($row as &$value) {
+                $value = "\0" . $value;
+            }
+        }
+        return $array;
+    }
 
     public static function cell2coord($cell, &$x, &$y)
     {

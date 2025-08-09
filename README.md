@@ -103,7 +103,7 @@ SimpleXLSXGen::fromArray($data)
 ![XLSX screenshot](styles.png)
 
 ### RAW Strings
-Prefix #0 cell value (use double quotes) or use ::raw() method, or tag ```<raw>```
+Prefix #0 cell value (use double quotes) or use ::raw() ::rawArray() methods or tag ```<raw>```
 ```php
 $PushkinDOB = '1799-07-06';
 $data = [
