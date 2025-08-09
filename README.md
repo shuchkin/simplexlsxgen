@@ -107,14 +107,21 @@ Prefix #0 cell value (use double quotes) or use ::raw() ::rawArray() methods or 
 ```php
 $PushkinDOB = '1799-07-06';
 $data = [
-    ['Datetime as raw string', "\0".'2023-01-09 11:16:34'],
-    ['Date as raw string', "\0".$PushkinDOB],
-    ['Disable type detection', "\0".'+12345'],
-    ['Insert greater/less them simbols', SimpleXLSXGen::raw('20- short term: <6 month')],
+    ['Datetime as raw string', "\0" . '2023-01-09 11:16:34'],
+    ['Date as raw string', "\0" . $PushkinDOB],
+    ['Disable type detection', "\0" . '+12345'],
+    ['Method ::raw, insert greater/less them simbols', SimpleXLSXGen::raw('20- short term: <6 month')],
     ['Formatted raw', '<b><center><raw>+123456 &lt;tag&gt;<tag2></raw></center></b>'],
 ];
 SimpleXLSXGen::fromArray($data)
     ->saveAs('test_rawstrings.xlsx');
+
+$data = [
+    ['test', 'raw', 'array'],
+    ['2025-08-09 14:36:34', '< tag >', 1]
+];
+$raw_data = SimpleXLSXGen::rawArray($data);
+SimpleXLSXGen::fromArray($raw_data)->saveAs('test_raw_array.xlsx');
 ```
 ### More examples
 ```php
