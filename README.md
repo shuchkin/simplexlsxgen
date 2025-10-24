@@ -92,6 +92,7 @@ $data = [
     ['Linebreaks', "Line 1\nLine 2\nLine 3"],
     ['Comments', '<!-- Comment without author -->No Author'],
     ['Comments + author + linebreaks', "<!-- Alex Pushkin: Born 6 June 1799 Moscow\r\nDied 10 February 1837 (aged 37) Saint Petersburg-->Pushkin"],
+    ['<rotation90>Rotation 90</rotation90>', 'Rotated header'],
 ];
 SimpleXLSXGen::fromArray($data)
     ->setDefaultFont('Courier New')

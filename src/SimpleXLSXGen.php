@@ -36,7 +36,7 @@ class SimpleXLSXGen
     protected $BR_STYLE;
     protected $SI; // shared strings
     protected $SI_KEYS;
-    protected $rIndex;
+//    protected $rIndex;
 
     protected $title;
     protected $subject;
@@ -83,6 +83,7 @@ class SimpleXLSXGen
     const A_MIDDLE = 16;
     const A_BOTTOM = 32;
     const A_WRAPTEXT = 64;
+    const A_ROTATION_90 = 128;
     const B_NONE = 0;
     const B_THIN = 1;
     const B_MEDIUM = 2;
@@ -576,6 +577,9 @@ class SimpleXLSXGen
                     if ($xf[1] & self::A_WRAPTEXT) {
                         $align .= ' wrapText="1"';
                     }
+                    if ($xf[1] & self::A_ROTATION_90) {
+                        $align .= ' textRotation="90"';
+                    }
 
                     // border
                     $BR_ID = 0;
@@ -817,9 +821,10 @@ class SimpleXLSXGen
                     }
                     $ct = $cv = $cf = null;
                     $N = $NF = $A = $F = $FL = $C = $BG = $FS = $FR = 0;
+                    $m = $m2 = null;
                     $BR = '';
                     if (is_string($v)) {
-                        if ($v[0] === "\0") { // RAW value as string
+                        if (strpos($v, "\0") === 0) { // RAW value as string
                             $v = substr($v, 1);
                             $vl = mb_strlen($v);
                         } else {
@@ -874,7 +879,7 @@ class SimpleXLSXGen
                                     if (preg_match('/ font-size="([^"]+)"/', $m[1], $m2)) {
                                         $FS = (int)$m2[1];
                                         if ($RH === 0) { // fix row height
-                                            $RH = ($FS > $this->defaultFontSize) ? round($FS * 1.50, 1) : 0;
+                                            $RH = ($FS > $this->defaultFontSize) ? round($FS * 1.50, 1, PHP_ROUND_HALF_UP) : 0;
                                         }
                                     }
                                 }
@@ -898,6 +903,9 @@ class SimpleXLSXGen
                                 }
                                 if (strpos($v, '<wraptext>') !== false) {
                                     $A += self::A_WRAPTEXT;
+                                }
+                                if (strpos($v, '<rotation90>') !== false) {
+                                    $A += self::A_ROTATION_90;
                                 }
                                 if (preg_match('/<a href="([^"]+)">(.*?)<\/a>/i', $v, $m)) {
                                     $F += self::F_HYPERLINK;
@@ -933,8 +941,6 @@ class SimpleXLSXGen
                             if ($FR) {
                                 $v = htmlspecialchars_decode($v);
                                 $vl = mb_strlen($v);
-                            } elseif ($N) {
-                                $cv = ltrim($v, '+');
                             } elseif ($v === '0' || preg_match('/^[-+]?[1-9]\d{0,14}$/', $v)) { // Integer as General
                                 $cv = ltrim($v, '+');
                                 if ($vl > 10) {
@@ -956,10 +962,10 @@ class SimpleXLSXGen
                                 }
                                 $cv = trim($v, ' +₽€');
                             } elseif (preg_match('/^([-+]?\d+)%$/', $v, $m)) {
-                                $cv = round($m[1] / 100, 2);
+                                $cv = round($m[1] / 100, 2, PHP_ROUND_HALF_UP);
                                 $N = self::N_PERCENT_INT; // [9] 0%
                             } elseif (preg_match('/^([-+]?\d+\.\d+)%$/', $v, $m)) {
-                                $cv = round($m[1] / 100, 4);
+                                $cv = round($m[1] / 100, 4, PHP_ROUND_HALF_UP);
                                 $N = self::N_PRECENT_DEC; // [10] 0.00%
                             } elseif (preg_match('/^(\d\d\d\d)-(\d\d)-(\d\d)$/', $v, $m)) {
                                 $cv = self::date2excel($m[1], $m[2], $m[3]);
@@ -1310,6 +1316,7 @@ class SimpleXLSXGen
     public static function cell2coord($cell, &$x, &$y)
     {
         $x = $y = 0;
+        $m = null;
         if (preg_match('/^([A-Z]+)(\d+)$/', $cell, $m)) {
             $len = strlen($m[1]);
             for ($i = 0; $i < $len; $i++) {

@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.5.12 (2025-10-24)
+* added tag ```<rotation90>```
+
 # 1.5.11 (2025-08-09)
 * added ::rawArray()
 
