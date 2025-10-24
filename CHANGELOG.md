@@ -1,7 +1,7 @@
 # Changelog
 
 # 1.5.12 (2025-10-24)
-* added tag ```<rotation90>```
+* added tag ```<rotation90>```, thx [wawaclem](https://github.com/wawaclem)
 
 # 1.5.11 (2025-08-09)
 * added ::rawArray()
