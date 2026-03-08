@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.5.13 (2026-03-09)
+* long numbers right alignment, thx [ErikLtz](https://github.com/ErikLtz) [#173](https://github.com/shuchkin/simplexlsxgen/issues/173)
+
 # 1.5.12 (2025-10-24)
 * added tag ```<rotation90>```, thx [wawaclem](https://github.com/wawaclem)
 

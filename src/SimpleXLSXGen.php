@@ -3,6 +3,7 @@
 /** @noinspection UnknownInspectionInspection */
 /* PHP5.6 */
 /** @noinspection PowerOperatorCanBeUsedInspection */
+/** @noinspection HttpUrlsUsage */
 /* PHP7 */
 /** @noinspection NullCoalescingOperatorCanBeUsedInspection */
 /** @noinspection PhpIssetCanBeReplacedWithCoalesceInspection */
@@ -982,7 +983,7 @@ class SimpleXLSXGen
                             } elseif (preg_match('/^(\d\d)\/(\d\d)\/(\d\d\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m)) {
                                 $cv = self::date2excel($m[3], $m[2], $m[1], $m[4], $m[5], $m[6]);
                                 $N = self::N_DATETIME; // [22] m/d/yy h:mm
-                            } elseif (preg_match('/^[0-9+-.]+$/', $v)) { // Long ?
+                            } elseif (preg_match('/^[-+]?[0-9\.]+$/', $v)) { // Long ?
                                 $A += ($A & (self::A_LEFT | self::A_CENTER)) ? 0 : self::A_RIGHT;
                             } elseif (preg_match('/^https?:\/\/\S+$/i', $v)) { // Hyperlink ?
                                 $h = explode('#', $v);
