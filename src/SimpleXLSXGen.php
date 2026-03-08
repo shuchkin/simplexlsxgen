@@ -947,11 +947,11 @@ class SimpleXLSXGen
                                 if ($vl > 10) {
                                     $N = self::N_INT; // [1] 0
                                 }
-                            } elseif (preg_match('/^[-+]?(0|[1-9]\d*)\.(\d+)$/', $v, $m)) {
+                            } elseif (preg_match('/^[-+]?(0|[1-9]\d*)\.\d\d?)$/', $v, $m)) { // Decimal
                                 $cv = ltrim($v, '+');
-                                if (strlen($m[2]) < 3) {
-                                    $N = self::N_DEC;
-                                }
+                                $N = self::N_DEC;
+                            } elseif (preg_match('/^[0-9\.\-\+]+$/', $v)) { // Long Number (card, phone, serial)?
+                                $A += ($A & (self::A_LEFT | self::A_CENTER)) ? 0 : self::A_RIGHT;
                             } elseif (preg_match('/^\$[-+]?[0-9\.]+$/', $v)) { // currency $?
                                 $N = self::N_DOLLAR;
                                 $cv = ltrim($v, '+$');
@@ -983,8 +983,6 @@ class SimpleXLSXGen
                             } elseif (preg_match('/^(\d\d)\/(\d\d)\/(\d\d\d\d) (\d\d):(\d\d):(\d\d)$/', $v, $m)) {
                                 $cv = self::date2excel($m[3], $m[2], $m[1], $m[4], $m[5], $m[6]);
                                 $N = self::N_DATETIME; // [22] m/d/yy h:mm
-                            } elseif (preg_match('/^[-+]?[0-9\.]+$/', $v)) { // Long ?
-                                $A += ($A & (self::A_LEFT | self::A_CENTER)) ? 0 : self::A_RIGHT;
                             } elseif (preg_match('/^https?:\/\/\S+$/i', $v)) { // Hyperlink ?
                                 $h = explode('#', $v);
                                 $this->sheets[$idx]['relidx']++;
