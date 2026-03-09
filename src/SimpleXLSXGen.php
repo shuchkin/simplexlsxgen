@@ -947,7 +947,7 @@ class SimpleXLSXGen
                                 if ($vl > 10) {
                                     $N = self::N_INT; // [1] 0
                                 }
-                            } elseif (preg_match('/^[-+]?(0|[1-9]\d*)\.\d\d?)$/', $v, $m)) { // Decimal
+                            } elseif (preg_match('/^[-+]?(0|[1-9]\d*)\.\d\d?$/', $v)) { // Decimal
                                 $cv = ltrim($v, '+');
                                 $N = self::N_DEC;
                             } elseif (preg_match('/^[0-9\.\-\+]+$/', $v)) { // Long Number (card, phone, serial)?
