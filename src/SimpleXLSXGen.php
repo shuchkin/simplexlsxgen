@@ -950,6 +950,8 @@ class SimpleXLSXGen
                             } elseif (preg_match('/^[-+]?(0|[1-9]\d*)\.\d\d?$/', $v)) { // Decimal
                                 $cv = ltrim($v, '+');
                                 $N = self::N_DEC;
+                            } elseif (preg_match('/^[-+]?(0|[1-9]{1,8})\.\d\d{0,8}$/', $v)) { // Real as General
+                                $cv = ltrim($v, '+');
                             } elseif (preg_match('/^[0-9\.\-\+]+$/', $v)) { // Long Number (card, phone, serial)?
                                 $A += ($A & (self::A_LEFT | self::A_CENTER)) ? 0 : self::A_RIGHT;
                             } elseif (preg_match('/^\$[-+]?[0-9\.]+$/', $v)) { // currency $?
