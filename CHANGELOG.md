@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.5.15 (2026-03-12)
+* fixed formatted numbers, thx [Roland](https://github.com/mrextreme) [#174](https://github.com/shuchkin/simplexlsxgen/issues/174#issuecomment-4045694443)
+
 # 1.5.14 (2026-03-11)
 * real numbers as General
 

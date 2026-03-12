@@ -942,6 +942,8 @@ class SimpleXLSXGen
                             if ($FR) {
                                 $v = htmlspecialchars_decode($v);
                                 $vl = mb_strlen($v);
+                            } elseif ($NF) {
+                                $cv = ltrim($v, '+'); // Formatted Number
                             } elseif ($v === '0' || preg_match('/^[-+]?[1-9]\d{0,14}$/', $v)) { // Integer as General
                                 $cv = ltrim($v, '+');
                                 if ($vl > 10) {
@@ -1228,6 +1230,11 @@ class SimpleXLSXGen
         return $this;
     }
 
+    /**
+     * @param $col int Column index starts with 1
+     * @param $width int Width in chars
+     * @return $this
+     */
     public function setColWidth($col, $width)
     {
         $this->sheets[$this->curSheet]['colwidth'][$col] = $width;
