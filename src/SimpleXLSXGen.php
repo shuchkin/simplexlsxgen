@@ -1231,13 +1231,22 @@ class SimpleXLSXGen
     }
 
     /**
-     * @param $col int Column index starts with 1
+     * @param $col int|string Column index starts with 1, or column letter ('A', 'AA'), or range ('A:C')
      * @param $width int Width in chars
      * @return $this
      */
     public function setColWidth($col, $width)
     {
-        $this->sheets[$this->curSheet]['colwidth'][$col] = $width;
+        if (is_string($col) && strpos($col, ':') !== false) {
+            list($from, $to) = explode(':', $col, 2);
+            $from = self::col2index($from);
+            $to = self::col2index($to);
+            for ($i = $from; $i <= $to; $i++) {
+                $this->sheets[$this->curSheet]['colwidth'][$i] = $width;
+            }
+            return $this;
+        }
+        $this->sheets[$this->curSheet]['colwidth'][self::col2index($col)] = $width;
         return $this;
     }
     public function rightToLeft($value = true)
@@ -1319,6 +1328,26 @@ class SimpleXLSXGen
             }
         }
         return $array;
+    }
+
+    private static function col2index($col)
+    {
+        if (is_int($col)) {
+            return $col;
+        }
+        $m = null;
+        if (preg_match('/^([A-Za-z]+)$/', $col, $m)) {
+            $letters = strtoupper($m[1]);
+            $len = strlen($letters);
+            $x = 0;
+            for ($i = 0; $i < $len; $i++) {
+                $int = ord($letters[$i]) - 65; // A -> 0, B -> 1
+                $int += ($i === $len - 1) ? 0 : 1;
+                $x += $int * pow(26, $len-$i-1);
+            }
+            return $x + 1;
+        }
+        return (int)$col;
     }
 
     public static function cell2coord($cell, &$x, &$y)

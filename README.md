@@ -97,7 +97,8 @@ $data = [
 SimpleXLSXGen::fromArray($data)
     ->setDefaultFont('Courier New')
     ->setDefaultFontSize(14)
-    ->setColWidth(1, 35)
+    ->setColWidth(1, 35)      // or ->setColWidth('A', 35)
+    ->setColWidth('B:C', 20)  // column letters and ranges also work
     ->mergeCells('A20:B20')
     ->saveAs('styles_and_tags.xlsx');
 ```
