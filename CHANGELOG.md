@@ -1,7 +1,7 @@
 # Changelog
 
 # 1.5.16 (2026-04-22)
-* setColWidth accepts column letters and ranges, e.g. setColWidth('A', 35) or setColWidth('A:C', 15), [#171](https://github.com/shuchkin/simplexlsxgen/issues/171)
+* setColWidth accepts column letters and ranges, e.g. setColWidth('A', 35) or setColWidth('A:C', 15), thx [Albert](https://github.com/lazaroagomez) [#171](https://github.com/shuchkin/simplexlsxgen/issues/171)
 
 # 1.5.15 (2026-03-12)
 * fixed formatted numbers, thx [Roland](https://github.com/mrextreme) [#174](https://github.com/shuchkin/simplexlsxgen/issues/174#issuecomment-4045694443)
