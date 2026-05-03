@@ -1,5 +1,8 @@
 # Changelog
 
+# 1.5.17 (2026-05-03)
+* datetime detection priority, thx [Ced](https://github.com/cauzanne) [#176](https://github.com/shuchkin/simplexlsxgen/issues/176)
+
 # 1.5.16 (2026-04-22)
 * setColWidth accepts column letters and ranges, e.g. setColWidth('A', 35) or setColWidth('A:C', 15), thx [Albert](https://github.com/lazaroagomez) [#171](https://github.com/shuchkin/simplexlsxgen/issues/171)
 
